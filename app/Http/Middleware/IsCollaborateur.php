@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class IsCollaborateur
+{
+    public function handle(Request $request, Closure $next)
+    {
+        if (Auth::check() && Auth::user()->role === 'collaborateur') {
+            return $next($request);
+        }
+        
+        return redirect('/login')->with('error', 'Vous n\'avez pas les droits d\'accès');
+    }
+}
