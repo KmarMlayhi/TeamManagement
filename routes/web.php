@@ -9,6 +9,7 @@ use App\Http\Middleware\IsAdmin;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\EquipeController;
 
 
 
@@ -28,6 +29,11 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     // Les routes pour valider et supprimer un utilisateur spécifique
     Route::post('/admin/users/{user}/validate', [AdminController::class, 'validateUser'])->name('admin.users.validate');
     Route::delete('/admin/users/{user}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+    Route::get('/admin/equipe', [EquipeController::class, 'index'])->name('equipes.index');
+    Route::get('/admin/equipe/create', [EquipeController::class, 'create'])->name('equipes.create');
+    Route::post('/admin/equipe/store', [EquipeController::class, 'store'])->name('equipes.store');
+    Route::delete('/admin/equipe/{id}', [EquipeController::class, 'destroy'])->name('equipes.destroy');
+
 });
 
 
@@ -53,3 +59,6 @@ Route::middleware('guest')->group(function () {
 
 
 Route::post('/logout', LogoutController::class)->name('logout');
+
+
+

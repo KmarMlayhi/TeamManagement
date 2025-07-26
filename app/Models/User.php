@@ -46,4 +46,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'is_validated' => 'boolean',
     ];
+    // app/Models/User.php
+    public function equipes()
+    {
+        return $this->belongsToMany(Equipe::class, 'equipe_utilisateur');
+    }
+
 }

@@ -9,7 +9,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
-    @yield('styles') {{-- Pour ajouter des styles spécifiques à une page --}}
+    @yield('styles')
 </head>
 <body>
 
@@ -31,8 +31,12 @@
             <li class="{{ Request::routeIs('admin.users.management') ? 'active' : '' }}">
                 <a href="{{ route('admin.users.management') }}"><i class="fas fa-users"></i> Utilisateurs</a>
             </li>
+             <li >
+                <a href="{{ route('equipes.create') }}"><i class="fas fa-users"></i> Gestion des équipes </a>
+            </li>
+
             <li>
-                <a href="#"><i class="fas fa-chart-bar"></i> Projets</a>
+                <a href="#"><i class="fas fa-chart-bar"></i> Gestion des projets</a>
             </li>
             <li>
                 <a href="#"><i class="fas fa-cog"></i> Paramètres</a>
