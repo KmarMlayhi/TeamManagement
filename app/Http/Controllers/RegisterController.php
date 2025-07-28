@@ -23,7 +23,7 @@ class RegisterController extends Controller
             'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'role'     => 'required|in:admin,collaborateur',
-            'poste'    => 'nullable|string|max:255',
+            'poste'    => 'required|string|max:255',
         ]);
          // Vérifier s’il y a déjà un admin
     if ($request->role === 'admin' && User::where('role', 'admin')->exists()) {
