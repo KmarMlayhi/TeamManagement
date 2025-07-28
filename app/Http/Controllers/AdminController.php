@@ -15,24 +15,33 @@ class AdminController extends Controller
 }
 
     
-    public function usersManagement()
-    {
-        // Récupérer uniquement les utilisateurs avec le rôle 'collaborateur' sans l'admin connecté lui-même
-        $users = User::where('role', 'collaborateur')
-                     ->where('id', '<>', Auth::id())
-                     ->paginate(10);
+    public function usersManagement(Request $request)
+{
+    $query = User::where('role', 'collaborateur')
+                ->where('id', '<>', Auth::id());
 
-        // Compteurs adaptés uniquement aux collaborateurs, sans l'admin
-        $totalUsers = User::where('role', 'collaborateur')->count();
-        $pendingUsersCount = User::where('role', 'collaborateur')
-                                 ->where('is_validated', false)
-                                 ->count();
-        $validatedUsersCount = User::where('role', 'collaborateur')
-                                  ->where('is_validated', true)
-                                  ->count();
-
-        return view('admin.users.management', compact('users', 'totalUsers', 'pendingUsersCount', 'validatedUsersCount'));
+    // Ajout de la recherche
+    if ($request->has('search')) {
+        $search = $request->input('search');
+        $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%$search%")
+              ->orWhere('email', 'like', "%$search%");
+        });
     }
+
+    $users = $query->paginate(5);
+
+    // Compteurs (adaptés si nécessaire avec la recherche)
+    $totalUsers = User::where('role', 'collaborateur')->count();
+    $pendingUsersCount = User::where('role', 'collaborateur')
+                             ->where('is_validated', false)
+                             ->count();
+    $validatedUsersCount = User::where('role', 'collaborateur')
+                              ->where('is_validated', true)
+                              ->count();
+
+    return view('admin.users.management', compact('users', 'totalUsers', 'pendingUsersCount', 'validatedUsersCount'));
+}
 
     public function validateUser(User $user)
     {

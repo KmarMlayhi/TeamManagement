@@ -1,0 +1,107 @@
+        :root {
+            --primary-color:  #4361ee; 
+            --secondary-color: #003366; 
+            --hover-color: #4a5c6a;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --accent-color: #e30613;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .auth-container {
+            display: flex;
+            min-height: 100vh;
+            background-color: white;
+        }
+        
+        .logo-sidebar {
+            width: 120px;
+            height: auto;
+        }
+        
+        .ministere-logo {
+            width: 180px;
+            height: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .sidebar {
+            background: linear-gradient(to bottom, var(--secondary-color), var(--primary-color));
+            color: white;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 35%;
+        }
+        
+        .auth-content {
+            padding: 3rem;
+            width: 65%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .auth-header {
+            color: var(--secondary-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.1rem rgba(0, 86, 179, 0.25);
+        }
+        
+        .btn-auth {
+            background-color: var(--secondary-color);
+            border: none;
+            padding: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-auth:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-2px);
+        }
+        
+        .input-group-text {
+            background-color: #e9ecef;
+            color: var(--primary-color);
+        }
+        
+        .password-toggle {
+            cursor: pointer;
+            background-color: #e9ecef;
+            border-left: none;
+            color: var(--dark-color);
+        }
+        
+        .forgot-password {
+            text-align: right;
+            margin-top: -0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .forgot-password a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .forgot-password a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+        
+        .alert {
+            border-left: 4px solid var(--accent-color);
+        }

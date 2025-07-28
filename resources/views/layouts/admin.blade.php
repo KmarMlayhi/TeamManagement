@@ -29,10 +29,10 @@
                 <a href="{{ route('admin.home') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             </li>
             <li class="{{ Request::routeIs('admin.users.management') ? 'active' : '' }}">
-                <a href="{{ route('admin.users.management') }}"><i class="fas fa-users"></i> Utilisateurs</a>
+                <a href="{{ route('admin.users.management') }}"><i class="fas fa-users"></i> Gestion des utilisateurs </a>
             </li>
              <li >
-                <a href="{{ route('equipes.create') }}"><i class="fas fa-users"></i> Gestion des équipes </a>
+                <a href="{{ route('equipes.index') }}"><i class="fas fa-users"></i> Gestion des équipes </a>
             </li>
 
             <li>
