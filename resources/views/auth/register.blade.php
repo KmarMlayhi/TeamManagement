@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/register.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/auth/register.css') }}">
 </head>
 <body>
 
@@ -75,14 +75,6 @@
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="poste" class="form-label">Poste</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
-                        <input type="text" name="poste" id="poste" class="form-control" placeholder="Votre poste administratif">
-                    </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
                     <label for="role" class="form-label">Rôle</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
@@ -90,10 +82,37 @@
                             <option value="">Sélectionner un rôle</option>
                             <option value="collaborateur">Collaborateur</option>
                             <option value="admin">Administrateur</option>
+                            <option value="chef_equipe">Chef d'Équipe</option>
                         </select>
                     </div>
                 </div>
+                <div class="col-md-6 mb-3">
+                <label for="grade" class="form-label">Grade</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-award"></i></span>
+                    <select name="grade" id="grade" class="form-select">
+                        <option value="">Sélectionner un grade</option>
+                        <option value="G1">G1</option>
+                        <option value="G2">G2</option>
+                        <option value="G3">G3</option>
+                        <option value="G4">G4</option>
+                        <option value="G5">G5</option>
+                    </select>
+                </div>
             </div>
+            </div>
+            <div class="row">
+            <!-- Ajoutez ces champs après le champ "Poste" -->
+            
+
+            <div class="col-md-6 mb-3">
+                <label for="fonction" class="form-label">Fonction</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-user-tie"></i></span>
+                    <input type="text" name="fonction" id="fonction" class="form-control" placeholder="Votre fonction spécifique">
+                </div>
+            </div>
+        </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">

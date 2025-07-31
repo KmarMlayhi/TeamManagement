@@ -23,7 +23,8 @@ return new class extends Migration
             $table->string('role')->default('collaborateur'); // rôle: admin ou collaborateur
             $table->boolean('is_validated')->default(false);  // validé ou pas par un admin
             $table->string('avatar')->nullable();             // photo de profil
-            $table->string('poste')->nullable();              // poste dans l’entreprise
+            $table->string('grade')->nullable(); // G1 à G5
+            $table->string('fonction')->nullable(); // Fonction personnalisée            // poste dans l’entreprise
 
             $table->rememberToken();                // token pour "remember me"
             $table->timestamps();                   // created_at et updated_at

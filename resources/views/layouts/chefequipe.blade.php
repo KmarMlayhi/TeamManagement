@@ -28,11 +28,11 @@
             <li class="{{ Request::routeIs('admin.home') ? 'active' : '' }}">
                 <a href="{{ route('admin.home') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             </li>
-            <li class="{{ Request::routeIs('admin.users.management') ? 'active' : '' }}">
-                <a href="{{ route('admin.users.management') }}"><i class="fas fa-users"></i> Gestion des utilisateurs </a>
+             <li >
+                <a href="{{ route('equipes.index') }}"><i class="fas fa-users"></i> Gestion des équipes </a>
             </li>
-            <li>
-                <a href="#"><i class="fas fa-cog"></i> Paramètres</a>
+            <li class="{{ Request::is('admin/projets*') ? 'active' : '' }}">
+                <a href="{{ route('admin.projets.index') }}"><i class="fas fa-project-diagram"></i> Gestion des projets</a>
             </li>
         </ul>
     </div>
