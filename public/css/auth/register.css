@@ -106,3 +106,6 @@
             font-weight: 500;
             color: #495057;
         }
+        .row {
+            margin-bottom: 0.5rem;
+        }

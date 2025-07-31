@@ -9,3 +9,12 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+/* Import des composants */
+@import 'components/variables';
+@import 'components/cards';
+@import 'components/tables';
+@import 'components/buttons';
+@import 'components/forms';
+@import 'components/badges';
+@import 'components/alerts';
+@import 'components/breadcrumb';

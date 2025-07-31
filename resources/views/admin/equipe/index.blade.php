@@ -103,6 +103,14 @@
                         </tbody>
                     </table>
                 </div>
+                 {{-- <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div class="text-muted small">
+                        Affichage de <strong>{{ $equipes->firstItem() }}</strong> à <strong>{{ $equipes->lastItem() }}</strong> sur <strong>{{ $equipes->total() }}</strong> equipes
+                    </div>
+                    <div>
+                        {{ $equipes->links() }}
+                    </div>
+                </div> --}}
             @endif
         </div>
     </div>

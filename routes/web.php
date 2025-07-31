@@ -6,10 +6,14 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CollaborateurController;
 use App\Http\Controllers\LoginController;
 use App\Http\Middleware\IsAdmin;
+use App\Http\Middleware\IsChefEquipe;
+use App\Http\Middleware\IsCollaborateyr;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\EquipeController;
+use App\Http\Controllers\Admin\ProjetController;
+use App\Http\Controllers\Admin\TacheController;
 
 
 
@@ -29,6 +33,8 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     // Les routes pour valider et supprimer un utilisateur spécifique
     Route::post('/admin/users/{user}/validate', [AdminController::class, 'validateUser'])->name('admin.users.validate');
     Route::delete('/admin/users/{user}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+    Route::post('/admin/users/{user}/suspend', [AdminController::class, 'suspendUser'])
+     ->name('admin.users.suspend');
     Route::get('/admin/equipe', [EquipeController::class, 'index'])->name('equipes.index');
     Route::get('/admin/equipe/create', [EquipeController::class, 'create'])->name('equipes.create');
     Route::post('/admin/equipe/store', [EquipeController::class, 'store'])->name('equipes.store');
@@ -37,6 +43,26 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::put('/admin/equipe/{id}', [EquipeController::class, 'update'])->name('equipe.update');
 
 
+});
+// Routes pour les projets
+Route::prefix('admin/projets')->name('admin.projets.')->middleware(['auth', 'isAdmin'])->group(function () {
+    Route::get('/', [ProjetController::class, 'index'])->name('index');
+    Route::get('/create', [ProjetController::class, 'create'])->name('create');
+    Route::post('/', [ProjetController::class, 'store'])->name('store');
+    Route::get('/{projet}', [ProjetController::class, 'show'])->name('show');
+    Route::get('/{projet}/edit', [ProjetController::class, 'edit'])->name('edit');
+    Route::put('/{projet}', [ProjetController::class, 'update'])->name('update');
+    Route::delete('/{projet}', [ProjetController::class, 'destroy'])->name('destroy');
+    
+    // Routes pour les tâches
+    Route::prefix('/{projet}/taches')->name('taches.')->group(function () {
+        Route::get('/', [TacheController::class, 'index'])->name('index');
+        Route::get('/create', [TacheController::class, 'create'])->name('create');
+        Route::post('/', [TacheController::class, 'store'])->name('store');
+        Route::get('/{tache}/edit', [TacheController::class, 'edit'])->name('edit');
+        Route::put('/{tache}', [TacheController::class, 'update'])->name('update');
+        Route::delete('/{tache}', [TacheController::class, 'destroy'])->name('destroy');
+    });
 });
 
 Route::middleware(['auth', 'isCollaborateur'])->group(function () {

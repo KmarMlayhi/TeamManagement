@@ -24,4 +24,8 @@ class Equipe extends Model
     {
         return $this->hasMany(Equipe::class, 'parent_id');
     }
+    public function projets()
+    {
+        return $this->belongsToMany(Projet::class);
+    }
 }

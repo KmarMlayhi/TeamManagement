@@ -25,6 +25,8 @@ class User extends Authenticatable
         'is_validated',
         'avatar',
         'poste',
+        'grade',     
+        'fonction'
     ];
 
     /**

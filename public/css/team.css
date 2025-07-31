@@ -239,3 +239,89 @@
     font-size: 1.75rem;
     margin-bottom: 1rem;
 }
+/* Améliorations spécifiques projets */
+.status-en_attente {
+    background-color: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+}
+
+.status-en_cours {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+.status-termine {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+}
+
+.status-suspendu {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+/* Amélioration des dates */
+.text-muted {
+    font-size: 0.85rem;
+    color: #6c757d !important;
+}
+
+/* Pagination */
+.pagination {
+    margin-bottom: 0;
+}
+
+/* Responsive table */
+@media (max-width: 992px) {
+    .table td:nth-child(3),
+    .table th:nth-child(3) {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .table td:nth-child(2),
+    .table th:nth-child(2) {
+        display: none;
+    }
+}
+/* Style pour la barre de recherche */
+.input-group {
+    max-width: 400px;
+}
+
+/* Style pour la pagination */
+.pagination {
+    margin-bottom: 0;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.pagination .page-link {
+    color: var(--primary-color);
+}
+
+/* Style pour le compteur de résultats */
+.text-muted small {
+    font-size: 0.85rem;
+}
+
+/* Harmonisation des selects */
+.select2-container .select2-selection--single {
+    height: auto;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 100%;
+}
+
+/* Pour les selects invalides */
+.is-invalid + .select2-container--default .select2-selection--single {
+    border-color: #dc3545;
+}

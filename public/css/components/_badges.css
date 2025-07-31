@@ -1,0 +1,33 @@
+.badge {
+    font-weight: 500;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--border-radius);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.badge-team {
+    background-color: rgba(0, 86, 179, 0.1);
+    color: var(--primary-color);
+}
+
+.badge-user {
+    background-color: rgba(0, 51, 102, 0.08);
+    color: var(--secondary-color);
+    margin: 0.15rem;
+}
+
+.status-badge {
+    font-size: 0.8rem;
+}
+
+.status-validated {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--success-color);
+}
+
+.status-pending {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--warning-color);
+}
