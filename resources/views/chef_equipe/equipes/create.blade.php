@@ -1,17 +1,16 @@
-@extends('layouts.admin')
+@extends('layouts.chef')
 
 @section('title', 'Créer une équipe')
 
 @section('content')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/team.css') }}">
 
-<!-- Breadcrumb -->
 <div class="breadcrumb-container">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('admin.home') }}"><i class="fas fa-home"></i></a></li>
-            <li class="breadcrumb-item"><a href="{{ route('equipes.index') }}">Équipes</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('chef_equipe.dashboard') }}"><i class="fas fa-home"></i></a></li>
+            <li class="breadcrumb-item"><a href="{{ route('chef_equipe.equipes.index') }}">Équipes</a></li>
             <li class="breadcrumb-item active" aria-current="page">Nouvelle équipe</li>
         </ol>
     </nav>
@@ -19,10 +18,10 @@
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0" style="color: var(--secondary-color);">
+        <h2 class="mb-0 text-secondary-color">
             <i class="fas fa-users me-2"></i>Gestion des Équipes
         </h2>
-        <a href="{{ route('equipes.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('chef_equipe.equipes.index') }}" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left me-1"></i> Retour
         </a>
     </div>
@@ -31,13 +30,14 @@
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Création d'une nouvelle équipe</h5>
         </div>
+        
         <div class="card-body">
-            <form action="{{ route('equipes.store') }}" method="POST" class="needs-validation" novalidate>
+            <form action="{{ route('chef_equipe.equipes.store') }}" method="POST" class="needs-validation" novalidate>
                 @csrf
 
-                <div class="row mb-4">
+                <div class="row g-3 mb-4">
                     <!-- Nom de l'équipe -->
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6">
                         <label for="nom" class="form-label required-field">Nom de l'équipe</label>
                         <input type="text" class="form-control @error('nom') is-invalid @enderror" 
                                id="nom" name="nom" value="{{ old('nom') }}" required>
@@ -51,30 +51,36 @@
                     </div>
 
                     <!-- Équipe mère -->
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6">
                         <label for="parent_id" class="form-label">Équipe parente</label>
                         <select class="form-select select2-single @error('parent_id') is-invalid @enderror" 
                                 id="parent_id" name="parent_id">
-                            <option value="">Aucune (équipe principale)</option>
+                            <option value="">Aucune (équipe principale - Niveau 1)</option>
                             @foreach($equipes as $equipe)
                                 <option value="{{ $equipe->id }}" {{ old('parent_id') == $equipe->id ? 'selected' : '' }}>
-                                    {{ $equipe->nom }}
+                                    {{ str_repeat('— ', $equipe->niveau) }} {{ $equipe->nom }} (Niveau {{ $equipe->niveau }})
                                 </option>
                             @endforeach
                         </select>
                         @error('parent_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                        <small class="form-text text-muted">
+                            Sélectionnez une équipe parente pour créer une sous-équipe (Niveau {{ $equipes->max('niveau') + 1 }})
+                        </small>
                     </div>
 
                     <!-- Sélection des membres -->
-                    <div class="col-12 mb-4">
+                    <div class="col-12">
                         <label for="user_ids" class="form-label required-field">Membres de l'équipe</label>
                         <select class="form-select select2-multiple @error('user_ids') is-invalid @enderror" 
                                 id="user_ids" name="user_ids[]" multiple="multiple" required>
                             @foreach($users as $user)
                                 <option value="{{ $user->id }}" {{ in_array($user->id, old('user_ids', [])) ? 'selected' : '' }}>
-                                    {{ $user->name }} - {{ $user->email }}
+                                    {{ $user->name }} ({{ $user->fonction }})
+                                    @if($user->role === 'chef_equipe')
+                                        <i class="fas fa-star text-warning ms-1" title="Chef d'équipe"></i>
+                                    @endif
                                 </option>
                             @endforeach
                         </select>
@@ -89,7 +95,6 @@
                     </div>
                 </div>
 
-                <!-- Boutons d'action -->
                 <div class="d-flex justify-content-between border-top pt-4">
                     <div>
                         <button type="submit" class="btn btn-primary me-2">
@@ -99,57 +104,72 @@
                             <i class="fas fa-eraser me-1"></i> Effacer
                         </button>
                     </div>
-                    <div>
-                        <a href="{{ route('equipes.index') }}" class="btn btn-outline-primary">
-                            <i class="fas fa-list me-1"></i> Liste des équipes
-                        </a>
-                    </div>
+                    <a href="{{ route('chef_equipe.equipes.index') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-list me-1"></i> Liste des équipes
+                    </a>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+@section('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(document).ready(function() {
-    // Initialisation des Select2
+    // Initialisation Select2
     $('.select2-single').select2({
-        placeholder: "Sélectionnez une option",
+        placeholder: "Sélectionnez une équipe parente",
         allowClear: true,
         width: '100%',
         language: {
-            noResults: function() {
-                return "Aucun résultat trouvé";
-            }
+            noResults: () => "Aucun résultat trouvé",
+            searching: () => "Recherche..."
         }
     });
 
     $('.select2-multiple').select2({
         placeholder: "Sélectionnez les membres...",
         width: '100%',
+        closeOnSelect: false,
         language: {
-            noResults: function() {
-                return "Aucun résultat trouvé";
-            }
+            noResults: () => "Aucun utilisateur trouvé",
+            maximumSelected: (e) => `Maximum ${e.maximum} sélections`
         }
     });
 
     // Validation Bootstrap
-    (function () {
-        'use strict'
-        const forms = document.querySelectorAll('.needs-validation')
+    (() => {
+        const forms = document.querySelectorAll('.needs-validation');
+        
         Array.from(forms).forEach(form => {
-            form.addEventListener('submit', event => {
-                if (!form.checkValidity()) {
-                    event.preventDefault()
-                    event.stopPropagation()
+            form.addEventListener('submit', function(e) {
+                const userSelect = document.getElementById('user_ids');
+                if (userSelect && userSelect.required && $('.select2-multiple').val().length === 0) {
+                    userSelect.setCustomValidity('Sélection requise');
+                    $('.select2-multiple').addClass('is-invalid');
                 }
-                form.classList.add('was-validated')
-            }, false)
-        })
-    })()
+
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+
+            // Reset validation on change
+            form.querySelectorAll('input, select').forEach(input => {
+                input.addEventListener('input', () => {
+                    if (input.classList.contains('is-invalid')) {
+                        input.classList.remove('is-invalid');
+                    }
+                });
+            });
+        });
+    })();
 });
 </script>
+@endsection
 @endsection

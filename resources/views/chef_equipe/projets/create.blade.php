@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.chef')
 
 @section('title', 'Créer un nouveau projet')
 
@@ -10,8 +10,8 @@
 <div class="breadcrumb-container">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('admin.home') }}"><i class="fas fa-home"></i></a></li>
-            <li class="breadcrumb-item"><a href="{{ route('admin.projets.index') }}">Projets</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('chef_equipe.dashboard') }}"><i class="fas fa-home"></i></a></li>
+            <li class="breadcrumb-item"><a href="{{ route('chef_equipe.projets.index') }}">Projets</a></li>
             <li class="breadcrumb-item active" aria-current="page">Nouveau projet</li>
         </ol>
     </nav>
@@ -22,7 +22,7 @@
         <h2 class="mb-0" style="color: var(--secondary-color);">
             <i class="fas fa-plus-circle me-2"></i>Créer un nouveau projet
         </h2>
-        <a href="{{ route('admin.projets.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('chef_equipe.projets.index') }}" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left me-1"></i> Retour
         </a>
     </div>
@@ -33,7 +33,7 @@
         </div>
 
         <div class="card-body">
-            <form action="{{ route('admin.projets.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('chef_equipe.projets.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <div class="row mb-4">
@@ -86,19 +86,25 @@
                     </div>
 
                     <!-- Équipe -->
+                    <!-- Équipe responsable (plusieurs équipes possibles) -->
                     <div class="col-12 mb-4">
-                        <label for="equipe_id" class="form-label ">Équipe responsable</label>
-                        <select class="form-select @error('equipe_id') is-invalid @enderror" id="equipe_id" name="equipe_id"  >
-                            <option value="">Sélectionnez une équipe</option>
+                        <label for="equipe_ids" class="form-label required-field">Équipes responsables</label>
+                        <select class="form-select @error('equipe_ids') is-invalid @enderror" 
+                                id="equipe_ids" 
+                                name="equipe_ids[]" 
+                                multiple="multiple"
+                                required>
                             @foreach($equipes as $equipe)
-                                <option value="{{ $equipe->id }}" {{ old('equipe_id') == $equipe->id ? 'selected' : '' }}>
+                                <option value="{{ $equipe->id }}" 
+                                    {{ in_array($equipe->id, old('equipe_ids', [])) ? 'selected' : '' }}>
                                     {{ $equipe->nom }}
                                 </option>
                             @endforeach
                         </select>
-                        @error('equipe_id')
+                        @error('equipe_ids')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                        <small class="form-text text-muted">Maintenez Ctrl (Windows) ou Cmd (Mac) pour sélectionner plusieurs équipes</small>
                     </div>
 
                     <!-- Budget -->
@@ -110,14 +116,14 @@
                         @enderror
                     </div>
 
-                    <!-- Cahier des charges -->
+                    <!-- Documents -->
                     <div class="col-12 mb-3">
-                        <label for="cahier_charge" class="form-label">Cahier des charges</label>
-                        <input type="file" class="form-control @error('cahier_charge') is-invalid @enderror" id="cahier_charge" name="cahier_charge">
-                        @error('cahier_charge')
+                        <label for="documents" class="form-label">Documents</label>
+                        <input type="file" class="form-control @error('documents') is-invalid @enderror" id="documents" name="documents[]" multiple>
+                        @error('documents')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <small class="text-muted">Formats acceptés: PDF, DOC, DOCX (Max: 5MB)</small>
+                        <small class="text-muted">Vous pouvez sélectionner plusieurs fichiers (PDF, DOC, DOCX, etc.)</small>
                     </div>
 
                     <!-- Description -->
@@ -125,15 +131,6 @@
                         <label for="description" class="form-label">Description</label>
                         <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="3">{{ old('description') }}</textarea>
                         @error('description')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Détails importants -->
-                    <div class="col-12 mb-3">
-                        <label for="details_importants" class="form-label">Détails importants</label>
-                        <textarea class="form-control @error('details_importants') is-invalid @enderror" id="details_importants" name="details_importants" rows="3">{{ old('details_importants') }}</textarea>
-                        @error('details_importants')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -156,10 +153,14 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(document).ready(function() {
-    // Initialisation de Select2
-    $('#equipe_id').select2({
-        placeholder: "Sélectionnez une équipe",
-        allowClear: true
+     $('#equipe_ids').select2({
+        placeholder: "Sélectionnez une ou plusieurs équipes",
+        allowClear: true,
+        width: '100%',
+        language: {
+            noResults: () => "Aucune équipe trouvée",
+            searching: () => "Recherche..."
+        }
     });
 
     // Validation des dates

@@ -325,3 +325,22 @@
 .is-invalid + .select2-container--default .select2-selection--single {
     border-color: #dc3545;
 }
+
+/* Style pour la modal */
+#equipeDetailsModal .modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+#equipeDetailsModal h6 {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+/* Style pour le tableau des membres */
+#equipeDetailsModal .table-sm th,
+#equipeDetailsModal .table-sm td {
+    padding: 0.3rem;
+    font-size: 0.9rem;
+}

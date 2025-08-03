@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.chef')
 
 @section('title', 'Modifier une équipe')
 
@@ -12,8 +12,8 @@
 <div class="breadcrumb-container">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('admin.home') }}"><i class="fas fa-home"></i></a></li>
-            <li class="breadcrumb-item"><a href="{{ route('equipes.index') }}">Équipes</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('chef_equipe.dashboard') }}"><i class="fas fa-home"></i></a></li>
+            <li class="breadcrumb-item"><a href="{{ route('chef_equipe.equipes.index') }}">Équipes</a></li>
             <li class="breadcrumb-item active" aria-current="page">Modifier {{ $equipe->nom }}</li>
         </ol>
     </nav>
@@ -32,7 +32,7 @@
         </div>
         
         <div class="card-body">
-            <form action="{{ route('equipe.update', $equipe->id) }}" method="POST" class="admin-form">
+            <form action="{{ route('chef_equipe.equipes.update', $equipe->id) }}" method="POST" class="admin-form">
                 @csrf
                 @method('PUT')
 
@@ -57,18 +57,18 @@
                         </select>
                     </div>
 
-                    <!-- Sélection des membres -->
-                    <div class="col-12 mb-4">
-                        <label for="utilisateurs" class="form-label required-field">Membres de l'équipe</label>
-                        <select class="form-select select2-multiple" id="utilisateurs" name="utilisateurs[]" multiple="multiple" required>
-                            @foreach($utilisateurs as $user)
-                                <option value="{{ $user->id }}" {{ in_array($user->id, $equipe->utilisateurs->pluck('id')->toArray()) ? 'selected' : '' }}>
-                                    {{ $user->name }} ({{ $user->email }})
-                                </option>
-                            @endforeach
-                        </select>
-                        <small class="form-text text-muted">Sélectionnez un ou plusieurs membres</small>
-                    </div>
+                  <!-- Sélection des membres -->
+<div class="col-12 mb-4">
+    <label for="user_ids" class="form-label required-field">Membres de l'équipe</label>
+    <select class="form-select select2-multiple" id="user_ids" name="user_ids[]" multiple="multiple" required>
+        @foreach($users as $user)
+            <option value="{{ $user->id }}" {{ isset($equipe) && $equipe->utilisateurs->contains($user->id) ? 'selected' : '' }}>
+                {{ $user->name }} ({{ $user->fonction }})
+            </option>
+        @endforeach
+    </select>
+    <small class="form-text text-muted">Sélectionnez un ou plusieurs membres</small>
+</div>
                 </div>
 
                 <!-- Boutons d'action -->
@@ -77,12 +77,12 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save me-1"></i> Enregistrer
                         </button>
-                        <a href="{{ route('equipes.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('chef_equipe.equipes.index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-times me-1"></i> Annuler
                         </a>
                     </div>
                     <div>
-                        <a href="{{ route('equipes.index') }}" class="btn btn-outline-primary">
+                        <a href="{{ route('chef_equipe.equipes.index') }}" class="btn btn-outline-primary">
                             <i class="fas fa-list me-1"></i> Retour à la liste
                         </a>
                     </div>

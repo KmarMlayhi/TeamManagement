@@ -16,8 +16,9 @@ return new class extends Migration
             $table->id();
             $table->string('nom');
             $table->unsignedBigInteger('parent_id')->nullable(); // Pour la sous-équipe
+            $table->unsignedInteger('niveau')->default(1);
             $table->timestamps();
-        });
+            $table->foreign('parent_id')->references('id')->on('equipes')->onDelete('set null');        });
     }
 
 

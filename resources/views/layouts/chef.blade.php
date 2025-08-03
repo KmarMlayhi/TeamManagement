@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Admin Panel')</title>
+    <title>@yield('title', 'Espace Chef d\'Équipe')</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -25,14 +25,34 @@
         </div>
 
         <ul class="sidebar-menu">
-            <li class="{{ Request::routeIs('admin.home') ? 'active' : '' }}">
-                <a href="{{ route('admin.home') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <!-- Dashboard -->
+            <li class="{{ Request::routeIs('chef_equipe.dashboard') ? 'active' : '' }}">
+                <a href="{{ route('chef_equipe.dashboard') }}"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a>
             </li>
-             <li >
-                <a href="{{ route('equipes.index') }}"><i class="fas fa-users"></i> Gestion des équipes </a>
+            
+            <!-- Gestion des équipes -->
+            <li class="{{ Request::is('chef-equipe/equipes*') ? 'active' : '' }}">
+                <a href="{{ route('chef_equipe.equipes.index') }}"><i class="fas fa-users"></i> Gestion des équipes</a>
             </li>
-            <li class="{{ Request::is('admin/projets*') ? 'active' : '' }}">
-                <a href="{{ route('admin.projets.index') }}"><i class="fas fa-project-diagram"></i> Gestion des projets</a>
+            
+            <!-- Gestion des projets -->
+            <li class="{{ Request::is('chef-equipe/projets*') ? 'active' : '' }}">
+                <a href="{{ route('chef_equipe.projets.index') }}"><i class="fas fa-project-diagram"></i> Gestion des projets</a>
+            </li>
+            
+            <!-- Gestion des tâches -->
+            <li class="{{ Request::is('chef-equipe/projets/*/taches*') ? 'active' : '' }}">
+                <a href="#"><i class="fas fa-tasks"></i> Gestion des tâches</a>
+            </li>
+            
+            <!-- Rapports -->
+            <li>
+                <a href="#"><i class="fas fa-chart-bar"></i> Rapports</a>
+            </li>
+            
+            <!-- Paramètres -->
+            <li class="{{ Request::is('chef-equipe/parametres*') ? 'active' : '' }}">
+                <a href="#"><i class="fas fa-cog"></i> Paramètres</a>
             </li>
         </ul>
     </div>
@@ -47,9 +67,11 @@
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                         <i class="fas fa-user-circle me-1"></i> {{ Auth::user()->name }}
+                        <span class="badge bg-primary ms-2">Chef d'Équipe</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profil</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-bell me-2"></i> Notifications</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form method="POST" action="{{ route('logout') }}">
@@ -68,7 +90,7 @@
     <!-- Main Content -->
     <div class="main-content">
         <div class="container-fluid">
-            {{-- Le contenu spécifique à chaque page sera injecté ici --}}
+            @include('partials.flash-messages')
             @yield('content')
         </div>
     </div>
@@ -80,7 +102,17 @@
         document.getElementById('sidebarToggle').addEventListener('click', function() {
             document.querySelector('.sidebar').classList.toggle('active');
         });
+
+        // Gestion des sous-menus
+        document.querySelectorAll('.sidebar-menu > li > a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (this.nextElementSibling && this.nextElementSibling.classList.contains('submenu')) {
+                    e.preventDefault();
+                    this.parentElement.classList.toggle('open');
+                }
+            });
+        });
     </script>
-    @yield('scripts') {{-- Pour ajouter des scripts spécifiques à une page --}}
+    @yield('scripts')
 </body>
 </html>

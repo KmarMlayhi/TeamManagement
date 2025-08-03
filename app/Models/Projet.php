@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,8 +11,7 @@ class Projet extends Model
 
     protected $fillable = [
         'nom', 'description', 'date_debut', 'date_fin_prevue', 'date_fin_reelle',
-        'statut', 'client', 'details_importants', 'cahier_charge_path', 'equipe_id',
-        'created_by', 'budget', 'avancement'
+        'statut', 'client', 'equipe_id', 'created_by', 'budget', 'avancement'
     ];
 
     protected $casts = [
@@ -20,26 +20,28 @@ class Projet extends Model
         'date_fin_reelle' => 'date',
     ];
 
-    public function equipe()
-    {
-        return $this->belongsTo(Equipe::class);
-    }
+    protected $appends = ['statut_text', 'statut_color'];
 
+    public function equipes()
+    {
+        return $this->belongsToMany(Equipe::class, 'projet_equipe');
+    }
+    
     public function taches()
     {
         return $this->hasMany(Tache::class);
     }
 
-    public function equipes()
+    public function documents()
     {
-        return $this->belongsToMany(Equipe::class);
+        return $this->hasMany(Document::class);
     }
 
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-    // Dans Projet.php
+
     public function getStatutTextAttribute()
     {
         return [

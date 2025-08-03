@@ -122,7 +122,7 @@
                 </form>
             </div>
             
-            @if($users->isEmpty()))
+            @if($users->isEmpty())
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>Aucun utilisateur à afficher.
                 </div>
