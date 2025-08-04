@@ -173,17 +173,16 @@ class ProjetController extends Controller
 
         return back()->with('success', 'Document supprimé avec succès');
     }
-    public function details(Projet $projet)
+
+
+public function details(Projet $projet)
 {
-    // Charger les relations nécessaires
+    // Charger les relations
     $projet->load([
-        'equipes.membres',
+        'equipes.utilisateurs:id,name,email,fonction', // si tu veux aussi les utilisateurs
         'documents',
-        'taches.equipe',
-        'commentaires.user'
     ]);
 
-    // Formater les données pour le modal
     return response()->json([
         'id' => $projet->id,
         'nom' => $projet->nom,
@@ -195,22 +194,23 @@ class ProjetController extends Controller
         'statut_text' => $projet->statut_text,
         'statut_class' => $projet->statut === 'termine' ? 'success' : ($projet->statut === 'en_cours' ? 'primary' : 'warning'),
         'progression' => $projet->progression,
-        'equipes' => $projet->equipes->map(function($equipe) {
+
+        'equipes' => $projet->equipes->map(function ($equipe) {
             return [
                 'id' => $equipe->id,
-                'nom' => $equipe->nom,
-                'membres_count' => $equipe->membres->count(),
-                'membres' => $equipe->membres->map(function($membre) {
+                'nom' => $equipe->nom ?? 'Équipe sans nom',
+                'utilisateurs' => $equipe->utilisateurs->map(function ($user) {
                     return [
-                        'id' => $membre->id,
-                        'name' => $membre->name,
-                        'email' => $membre->email,
-                        'role' => $membre->pivot->role
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'fonction' => $user->fonction,
                     ];
-                })
+                }),
             ];
         }),
-        'documents' => $projet->documents->map(function($document) {
+
+        'documents' => $projet->documents->map(function ($document) {
             return [
                 'id' => $document->id,
                 'nom' => $document->nom,
@@ -218,24 +218,8 @@ class ProjetController extends Controller
                 'url' => Storage::url($document->chemin)
             ];
         }),
-        'taches' => $projet->taches->map(function($tache) {
-            return [
-                'id' => $tache->id,
-                'nom' => $tache->nom,
-                'date_echeance_formatted' => $tache->date_echeance->format('d/m/Y'),
-                'statut' => $tache->statut,
-                'statut_text' => $tache->statut_text,
-                'statut_class' => $tache->statut === 'termine' ? 'success' : ($tache->statut === 'en_cours' ? 'primary' : 'warning'),
-                'equipe_nom' => $tache->equipe->nom ?? null
-            ];
-        }),
-        'commentaires' => $projet->commentaires->map(function($commentaire) {
-            return [
-                'id' => $commentaire->id,
-                'contenu' => $commentaire->contenu,
-                'auteur' => $commentaire->user->name
-            ];
-        })
     ]);
 }
+
+
 }
