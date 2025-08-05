@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Chef;
 
 use App\Http\Controllers\Controller;
 use App\Models\Projet;
+use App\Models\Document;
 use App\Models\Equipe;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -61,17 +62,16 @@ class ProjetController extends Controller
 
         // Traitement des documents
         if ($request->hasFile('documents')) {
-            $documents = [];
-            foreach ($request->file('documents') as $document) {
-                $path = $document->store('projets/documents');
-                $documents[] = [
-                    'nom' => $document->getClientOriginalName(),
+            foreach ($request->file('documents') as $file) {
+                $path = $file->store('projets/documents', 'public');
+                Document::create([
+                    'projet_id' => $projet->id,
+                    'nom' => $file->getClientOriginalName(),
                     'chemin' => $path,
-                    'type' => $document->getClientMimeType(),
-                    'taille' => $document->getSize(),
-                ];
+                    'type' => $file->getClientMimeType(),
+                    'taille' => $file->getSize(),
+                ]);
             }
-            $projet->documents()->createMany($documents);
         }
 
         return redirect()->route('chef_equipe.projets.index')
@@ -125,23 +125,25 @@ class ProjetController extends Controller
         $projet->equipes()->sync($validated['equipe_ids']);
 
         // Traitement des nouveaux documents
-        if ($request->hasFile('documents')) {
-            $documents = [];
-            foreach ($request->file('documents') as $document) {
-                $path = $document->store('projets/documents');
-                $documents[] = [
-                    'nom' => $document->getClientOriginalName(),
+        if ($request->hasFile('new_documents')) {
+        foreach ($request->file('new_documents') as $file) {
+            if ($file->isValid()) {
+                $path = $file->store('projets/documents', 'public');
+                
+                Document::create([
+                    'projet_id' => $projet->id,
+                    'nom' => $file->getClientOriginalName(),
                     'chemin' => $path,
-                    'type' => $document->getClientMimeType(),
-                    'taille' => $document->getSize(),
-                ];
+                    'type' => $file->getClientMimeType(),
+                    'taille' => $file->getSize(),
+                ]);
             }
-            $projet->documents()->createMany($documents);
         }
-
-        return redirect()->route('chef_equipe.projets.index')
-            ->with('success', 'Projet mis à jour avec succès');
     }
+
+    return redirect()->route('chef_equipe.projets.index')
+         ->with('success', 'Projet mis à jour avec succès');
+}
 
     public function destroy($id)
     {
@@ -191,6 +193,7 @@ public function details(Projet $projet)
         'date_debut_formatted' => $projet->date_debut->format('d/m/Y'),
         'date_fin_prevue_formatted' => $projet->date_fin_prevue->format('d/m/Y'),
         'statut' => $projet->statut,
+        'budget' => $projet->budget,
         'statut_text' => $projet->statut_text,
         'statut_class' => $projet->statut === 'termine' ? 'success' : ($projet->statut === 'en_cours' ? 'primary' : 'warning'),
         'progression' => $projet->progression,
@@ -220,6 +223,20 @@ public function details(Projet $projet)
         }),
     ]);
 }
+public function destroyDocument(Document $document)
+{
+    // Vérifier que l'utilisateur a le droit de supprimer ce document
+    if ($document->projet->created_by !== auth()->id()) {
+        abort(403);
+    }
 
+    // Supprimer le fichier physique
+    Storage::disk('public')->delete($document->chemin);
+
+    // Supprimer l'entrée en base de données
+    $document->delete();
+
+    return response()->json(['success' => true]);
+}
 
 }

@@ -154,7 +154,7 @@
 <div class="modal fade" id="projetDetailsModal" tabindex="-1" aria-labelledby="projetDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
+            <div class="modal-header text-white">
                 <h5 class="modal-title" id="projetDetailsModalLabel">
                     <i class="fas fa-project-diagram me-2"></i>Détails du projet
                 </h5>
@@ -166,9 +166,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-1"></i> Fermer
-                </button>
+
             </div>
         </div>
     </div>

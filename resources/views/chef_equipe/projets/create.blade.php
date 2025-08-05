@@ -117,9 +117,20 @@
                     </div>
 
                     <!-- Documents -->
-                    <div class="col-12 mb-3">
+                    <div class="file-upload-container">
                         <label for="documents" class="form-label">Documents</label>
-                        <input type="file" class="form-control @error('documents') is-invalid @enderror" id="documents" name="documents[]" multiple>
+                        <div class="input-group">
+                            <input type="file" class="form-control @error('documents') is-invalid @enderror" 
+                                id="documents" name="documents[]" multiple 
+                                style="display: none;" 
+                                onchange="updateFileList(this)">
+                            <button class="btn btn-outline-secondary" type="button" 
+                                    onclick="document.getElementById('documents').click()">
+                                <i class="fas fa-folder-open"></i> Choisir des fichiers
+                            </button>
+                            <input type="text" class="form-control" id="file-list" 
+                                placeholder="Aucun fichier sélectionné" readonly>
+                        </div>
                         @error('documents')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -174,5 +185,17 @@ $(document).ready(function() {
         }
     });
 });
+function updateFileList(input) {
+    const fileList = document.getElementById('file-list');
+    if (input.files.length > 0) {
+        const files = [];
+        for (let i = 0; i < input.files.length; i++) {
+            files.push(input.files[i].name);
+        }
+        fileList.value = files.join(', ');
+    } else {
+        fileList.value = 'Aucun fichier sélectionné';
+    }
+}
 </script>
 @endsection

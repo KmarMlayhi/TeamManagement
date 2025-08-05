@@ -17,139 +17,123 @@ $(document).ready(function () {
         $.get(`/chef-equipe/projets/${projetId}/details`, function (data) {
             let html = `
                 <div class="mb-4">
-                    <h3 class="text-primary mb-3"><i class="fas fa-project-diagram me-2"></i>${
-                        data.nom
-                    }</h3>
-                    <div class="bg-light p-4 rounded mb-4">
-                        <p class="lead mb-0">${
-                            data.description || "Aucune description disponible"
-                        }</p>
+                <h3 class="titre-principal mb-3">${data.nom}</h3>
+                    <div class="description-container">
+                        <h5 class="description-title">Description Projet</h5>
+                        <div class="description-content bg-light p-3 rounded">
+                            <p class="mb-0">${
+                                data.description ||
+                                "Aucune description disponible"
+                            }</p>
+                        </div>
+                    </div>
+                </div> 
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5 class="section-title">Informations de base</h5>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <th>Client</th>
+                                    <td>${data.client || "Non spécifié"}</td>
+                                </tr>
+                                <tr>
+                                    <th>Date de début</th>
+                                    <td>${data.date_debut_formatted}</td>
+                                </tr>
+                                <tr>
+                                    <th>Date de fin prévue</th>
+                                    <td>${data.date_fin_prevue_formatted}</td>
+                                </tr>
+                                <tr>
+                                    <th>Budget</th>
+                                    <td>${data.budget || "Non spécifié"}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="section-title">État du projet</h5>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <th>Statut</th>
+                                    <td><span class="badge bg-${
+                                        data.statut_class
+                                    }">${data.statut_text}</span></td>
+                                </tr>
+                                <tr>
+                                    <th>Progression</th>
+                                    <td>
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar" role="progressbar" style="width: ${
+                                                data.progression
+                                            }%" 
+                                                 aria-valuenow="${
+                                                     data.progression
+                                                 }" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <small class="text-muted">${
+                                            data.progression
+                                        }% complété</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 
-                <h5 class="section-title"><i class="fas fa-info-circle me-2"></i>Informations clés</h5>
-                <div class="info-grid">
-                    <div class="info-card">
-                        <h6><i class="fas fa-user-tie me-2"></i>Client</h6>
-                        <p>${data.client || "Non spécifié"}</p>
-                    </div>
-                    
-                    <div class="info-card">
-                        <h6><i class="fas fa-calendar-day me-2"></i>Date de début</h6>
-                        <p>${data.date_debut_formatted}</p>
-                    </div>
-                    
-                    <div class="info-card">
-                        <h6><i class="fas fa-calendar-check me-2"></i>Date de fin prévue</h6>
-                        <p>${data.date_fin_prevue_formatted}</p>
-                    </div>
-                    
-                    <div class="info-card">
-                        <h6><i class="fas fa-tasks me-2"></i>Statut</h6>
-                        <p><span class="badge bg-${data.statut_class}">${
-                data.statut_text
-            }</span></p>
-                    </div>
-                </div>
-                
-                <div class="info-card mb-4">
-                    <h6><i class="fas fa-chart-line me-2"></i>Progression</h6>
-                    <div class="progress-container">
-                        <div class="progress-bar-custom" style="width: ${
-                            data.progression
-                        }%;">${data.progression}%</div>
-                    </div>
-                    <div class="d-flex justify-content-between mt-2">
-                        <small>Début du projet</small>
-                        <small>Objectif</small>
-                    </div>
-                </div>
-                
-                <h5 class="section-title"><i class="fas fa-file-alt me-2"></i>Documents</h5>
+                <h5 class="section-title">Documents</h5>
             `;
 
             if (data.documents && data.documents.length > 0) {
-                html += `<div class="mb-4">`;
+                html += `<ul class="list-group mb-4">`;
                 data.documents.forEach((doc) => {
-                    const iconClass =
-                        doc.type === "pdf"
-                            ? "doc-pdf"
-                            : doc.type === "word"
-                            ? "doc-word"
-                            : doc.type === "excel"
-                            ? "doc-excel"
-                            : "doc-other";
-
-                    const iconType =
-                        doc.type === "pdf"
-                            ? "fa-file-pdf"
-                            : doc.type === "word"
-                            ? "fa-file-word"
-                            : doc.type === "excel"
-                            ? "fa-file-excel"
-                            : "fa-file";
-
                     html += `
-                        <div class="document-card">
-                            <div class="doc-icon ${iconClass}">
-                                <i class="fas ${iconType}"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="fw-medium">${doc.nom}</div>
-                                <small class="text-muted">${doc.type.toUpperCase()} Document</small>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-file me-2 text-muted"></i>
+                                ${doc.nom}
+                                <small class="text-muted ms-2">(${doc.type.toUpperCase()})</small>
                             </div>
                             <a href="${
                                 doc.url
                             }" class="btn btn-sm btn-outline-primary" download>
-                                <i class="fas fa-download"></i>
+                                <i class="fas fa-download"></i> Télécharger
                             </a>
-                        </div>
+                        </li>
                     `;
                 });
-                html += `</div>`;
+                html += `</ul>`;
             } else {
                 html += `
-                    <div class="empty-state mb-4">
-                        <i class="fas fa-file-circle-exclamation"></i>
-                        <h5 class="mt-3">Aucun document disponible</h5>
-                        <p class="text-muted">Aucun document n'a été ajouté à ce projet.</p>
+                    <div class="alert alert-light">
+                        <i class="fas fa-info-circle me-2"></i>Aucun document disponible pour ce projet
                     </div>
                 `;
             }
 
-            html += `<h5 class="section-title"><i class="fas fa-users me-2"></i>Équipes et membres</h5>`;
+            html += `<h5 class="section-title">Équipes impliquées</h5>`;
 
             if (data.equipes && data.equipes.length > 0) {
                 data.equipes.forEach((equipe) => {
                     html += `
-                        <div class="team-card mb-4">
-                            <div class="team-header">
-                                <div class="team-icon">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                                <h5 class="team-title">${
-                                    equipe.nom || "Nom non spécifié"
-                                }</h5>
-                            </div>
-                            
-                            <div class="mt-3">
-                                <h6>Membres (${equipe.utilisateurs.length})</h6>
+                        <div class="mb-4">
+                            <h6 class="fw-bold">${
+                                equipe.nom || "Équipe sans nom"
+                            }</h6>
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Fonction</th>
+                                        <th>Email</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                     `;
 
                     if (equipe.utilisateurs && equipe.utilisateurs.length > 0) {
-                        html += `
-                            <div class="table-responsive">
-                                <table class="table table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Nom</th>
-                                            <th>Fonction</th>
-                                            <th>Email</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                        `;
-
                         equipe.utilisateurs.forEach((user) => {
                             html += `
                                 <tr>
@@ -159,29 +143,20 @@ $(document).ready(function () {
                                 </tr>
                             `;
                         });
-
-                        html += `
-                                    </tbody>
-                                </table>
-                            </div>
-                        `;
                     } else {
                         html += `
-                            <div class="empty-state p-3">
-                                <i class="fas fa-user-slash"></i>
-                                <p class="mb-0 mt-2">Aucun membre dans cette équipe</p>
-                            </div>
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-3">Aucun membre dans cette équipe</td>
+                            </tr>
                         `;
                     }
 
-                    html += `</div></div>`;
+                    html += `</tbody></table></div>`;
                 });
             } else {
                 html += `
-                    <div class="empty-state">
-                        <i class="fas fa-users-slash"></i>
-                        <h5 class="mt-3">Aucune équipe assignée</h5>
-                        <p class="text-muted">Aucune équipe n'est actuellement assignée à ce projet.</p>
+                    <div class="alert alert-light">
+                        <i class="fas fa-info-circle me-2"></i>Aucune équipe assignée à ce projet
                     </div>
                 `;
             }

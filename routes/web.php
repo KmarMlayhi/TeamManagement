@@ -67,6 +67,7 @@ Route::middleware(['auth', 'isChefEquipe'])->prefix('chef-equipe')->name('chef_e
         Route::put('/{projet}', [ProjetController::class, 'update'])->name('update');
         Route::delete('/{projet}', [ProjetController::class, 'destroy'])->name('destroy');
         
+        
         // Gestion des tâches
         Route::prefix('/{projet}/taches')->name('taches.')->group(function () {
             Route::get('/', [TacheController::class, 'index'])->name('index');
@@ -77,6 +78,8 @@ Route::middleware(['auth', 'isChefEquipe'])->prefix('chef-equipe')->name('chef_e
             Route::delete('/{tache}', [TacheController::class, 'destroy'])->name('destroy');
         });
     });
+    Route::delete('documents/{document}', [ProjetController::class, 'destroyDocument'])
+                ->name('documents.destroy');
 });
 
 //Routes Collaborateurs 
