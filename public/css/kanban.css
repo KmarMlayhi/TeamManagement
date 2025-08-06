@@ -1,0 +1,54 @@
+/* kanban.css */
+.kanban-board {
+    min-height: 70vh;
+}
+
+.kanban-column {
+    min-height: 60vh;
+    transition: background-color 0.3s ease;
+}
+
+.kanban-task {
+    cursor: grab;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kanban-task:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.kanban-task.dragging {
+    transform: rotate(3deg);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    z-index: 1000 !important;
+}
+
+.task-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.task-description {
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.assignee-info img {
+    transition: transform 0.2s ease;
+}
+
+.assignee-info img:hover {
+    transform: scale(1.2);
+}
+
+.task-meta .badge {
+    font-size: 0.75rem;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .kanban-column {
+        min-height: 40vh;
+    }
+}

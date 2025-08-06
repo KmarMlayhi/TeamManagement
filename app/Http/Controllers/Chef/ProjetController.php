@@ -12,9 +12,10 @@ class ProjetController extends Controller
 {
     public function index(Request $request)
     {
-        // Modifier 'equipe' en 'equipes'
+        
         $query = Projet::with(['equipes', 'createdBy'])
-                    ->where('created_by', auth()->id());
+                    ->where('created_by', auth()->id())
+                    ->latest();
         
         // Recherche par nom
         if ($request->has('search')) {

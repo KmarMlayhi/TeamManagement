@@ -9,18 +9,27 @@ class Equipe extends Model
     use HasFactory;
 
     protected $fillable = ['nom', 'parent_id', 'niveau','created_by']; 
+    protected $maxNiveau = 5;
     protected static function booted()
     {
         static::creating(function ($equipe) {
             self::updateNiveau($equipe);
+            self::validateNiveau($equipe);
         });
 
         static::updating(function ($equipe) {
             if ($equipe->isDirty('parent_id')) {
                 self::updateNiveau($equipe);
+                self::validateNiveau($equipe);
                 $equipe->updateChildrenNiveau();
             }
         });
+    }
+    protected static function validateNiveau($equipe)
+    {
+        if ($equipe->niveau > $equipe->maxNiveau) {
+            throw new \Exception("La hiérarchie ne peut pas dépasser {$equipe->maxNiveau} niveaux.");
+        }
     }
     protected static function updateNiveau($equipe)
     {

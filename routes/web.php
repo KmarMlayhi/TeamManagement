@@ -68,15 +68,20 @@ Route::middleware(['auth', 'isChefEquipe'])->prefix('chef-equipe')->name('chef_e
         Route::delete('/{projet}', [ProjetController::class, 'destroy'])->name('destroy');
         
         
-        // Gestion des tâches
-        Route::prefix('/{projet}/taches')->name('taches.')->group(function () {
+         Route::prefix('{projet}/taches')->name('taches.')->group(function () {
             Route::get('/', [TacheController::class, 'index'])->name('index');
             Route::get('/create', [TacheController::class, 'create'])->name('create');
             Route::post('/', [TacheController::class, 'store'])->name('store');
             Route::get('/{tache}/edit', [TacheController::class, 'edit'])->name('edit');
             Route::put('/{tache}', [TacheController::class, 'update'])->name('update');
             Route::delete('/{tache}', [TacheController::class, 'destroy'])->name('destroy');
+            
+            // Routes supplémentaires pour Kanban
+            Route::get('/kanban', [TacheController::class, 'kanban'])->name('kanban');
+            Route::post('/update-status', [TacheController::class, 'updateStatus'])->name('update-status');
+            Route::post('/reorder', [TacheController::class, 'reorder'])->name('reorder');
         });
+    
     });
     Route::delete('documents/{document}', [ProjetController::class, 'destroyDocument'])
                 ->name('documents.destroy');

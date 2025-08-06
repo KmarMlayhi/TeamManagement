@@ -66,7 +66,8 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                         <small class="form-text text-muted">
-                            Sélectionnez une équipe parente pour créer une sous-équipe (Niveau {{ $equipes->max('niveau') + 1 }})
+                            Sélectionnez une équipe parente pour créer une sous-équipe 
+                            {{-- (Niveau {{ $equipes->max('niveau') + 1 }}) --}}
                         </small>
                     </div>
 

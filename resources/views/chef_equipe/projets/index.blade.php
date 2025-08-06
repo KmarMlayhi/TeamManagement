@@ -76,6 +76,7 @@
                                 <th>Équipe</th>
                                 <th>Dates</th>
                                 <th>Statut</th>
+                                <th> Taches </th>
                                 <th style="width: 140px;">Actions</th>
                             </tr>
                         </thead>
@@ -110,6 +111,12 @@
                                     <span class="status-badge status-{{ $projet->statut }}">
                                         <i class="fas fa-circle me-1 small"></i>{{ $projet->statut_text }}
                                     </span>
+                                </td>
+                                <td>
+                                    <a href="{{ route('chef_equipe.projets.taches.index', $projet) }}" 
+                                    class="btn btn-primary btn-task-manager">
+                                    <i class="fas fa-tasks"></i> Tâches
+                                    </a>
                                 </td>
                                 <td>
                                     <div class="d-flex gap-2">

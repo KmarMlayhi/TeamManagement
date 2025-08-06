@@ -14,7 +14,8 @@ class EquipeController extends Controller
 {
     public function index()
     {
-        $query = Equipe::with(['utilisateurs', 'children', 'parent']);
+        $query = Equipe::with(['utilisateurs', 'children', 'parent'])
+                 ->latest();
         
         if (Schema::hasColumn('equipes', 'created_by')) {
             $query->where('created_by', Auth::id());
@@ -30,7 +31,7 @@ class EquipeController extends Controller
     public function create()
     {
         $users = User::where('is_validated', true)->get();
-        $query = Equipe::where('niveau', '<', 3);
+        $query = Equipe::where('niveau', '<', 4);
         
 
         $equipes = $query->get();
@@ -48,8 +49,8 @@ class EquipeController extends Controller
             function ($attribute, $value, $fail) {
                 if ($value) {
                     $parent = Equipe::find($value);
-                    if ($parent && $parent->niveau >= 3) {
-                        $fail('La hiérarchie ne peut pas dépasser 3 niveaux.');
+                    if ($parent && $parent->niveau >= 4) {
+                        $fail('La hiérarchie ne peut pas dépasser 5 niveaux.');
                     }
                 }
             }
@@ -76,7 +77,7 @@ class EquipeController extends Controller
         $users = User::where('is_validated', true)->get();
         
         $equipesQuery = Equipe::where('id', '!=', $id)
-                            ->where('niveau', '<', 3);
+                            ->where('niveau', '<', 4);
 
         $autresEquipes = $equipesQuery->get();
 
@@ -159,12 +160,13 @@ class EquipeController extends Controller
                 'email' => $user->email
             ];
         }),
-        'sous_equipes' => $equipe->children->map(function($child) {
-            return [
-                'nom' => $child->nom,
-                'membres_count' => $child->utilisateurs->count()
-            ];
-        })
+         'sous_equipes' => $equipe->children()->withCount('utilisateurs')->get()->map(function($child) {
+        return [
+            'nom' => $child->nom,
+            'niveau' => $child->niveau, // Ajout du niveau
+            'membres_count' => $child->utilisateurs_count
+        ];
+    })
     ]);
 }
 }

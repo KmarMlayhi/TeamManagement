@@ -39,21 +39,6 @@
             <li class="{{ Request::is('chef-equipe/projets*') ? 'active' : '' }}">
                 <a href="{{ route('chef_equipe.projets.index') }}"><i class="fas fa-project-diagram"></i> Gestion des projets</a>
             </li>
-            
-            <!-- Gestion des tâches -->
-            <li class="{{ Request::is('chef-equipe/projets/*/taches*') ? 'active' : '' }}">
-                <a href="#"><i class="fas fa-tasks"></i> Gestion des tâches</a>
-            </li>
-            
-            <!-- Rapports -->
-            <li>
-                <a href="#"><i class="fas fa-chart-bar"></i> Rapports</a>
-            </li>
-            
-            <!-- Paramètres -->
-            <li class="{{ Request::is('chef-equipe/parametres*') ? 'active' : '' }}">
-                <a href="#"><i class="fas fa-cog"></i> Paramètres</a>
-            </li>
         </ul>
     </div>
 
@@ -65,11 +50,11 @@
             </button>
             <div class="navbar-nav ms-auto">
                 <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-user-circle me-1"></i> {{ Auth::user()->name }}
                         <span class="badge bg-primary ms-2">Chef d'Équipe</span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profil</a></li>
                         <li><a class="dropdown-item" href="#"><i class="fas fa-bell me-2"></i> Notifications</a></li>
                         <li><hr class="dropdown-divider"></li>
@@ -103,14 +88,15 @@
             document.querySelector('.sidebar').classList.toggle('active');
         });
 
-        // Gestion des sous-menus
-        document.querySelectorAll('.sidebar-menu > li > a').forEach(link => {
-            link.addEventListener('click', function(e) {
-                if (this.nextElementSibling && this.nextElementSibling.classList.contains('submenu')) {
-                    e.preventDefault();
-                    this.parentElement.classList.toggle('open');
-                }
-            });
+        // Fermer le menu déroulant quand on clique ailleurs
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('navbarDropdown');
+            const isClickInsideDropdown = dropdown.contains(event.target);
+            
+            if (!isClickInsideDropdown) {
+                const dropdownMenu = document.querySelector('.dropdown-menu');
+                dropdownMenu.classList.remove('show');
+            }
         });
     </script>
     @yield('scripts')
