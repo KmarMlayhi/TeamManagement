@@ -26,7 +26,8 @@
             </div>
         </div>
         
-        <!-- Section des fonctionnalités -->
+        
+       <!-- Section des fonctionnalités -->
         <div class="features-section">
             <h3 class="section-title">Fonctionnalités disponibles</h3>
             <div class="feature-grid">
@@ -36,7 +37,7 @@
                     </div>
                     <h3>Gestion des projets</h3>
                     <p>Planifiez les projets de vos équipes, attribuez des tâches et suivez les échéances.</p>
-                    <a href="{{ route('chef_equipe.projets.index') }}" class="btn btn-outline-primary mt-3">Accéder <i class="fas fa-arrow-right ms-2"></i></a>
+                    <a href="{{ route('chef_equipe.projets.index') }}" class="btn btn-outline-primary">Accéder <i class="fas fa-arrow-right ms-1"></i></a>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon tracking">
@@ -44,11 +45,11 @@
                     </div>
                     <h3>Suivi des équipes</h3>
                     <p>Créer les équipes et assurer le bon déroulement de vos projets.</p>
-                    <a href="{{ route('chef_equipe.equipes.index') }}" class="btn btn-outline-primary mt-3">Accéder <i class="fas fa-arrow-right ms-2"></i></a>
+                    <a href="{{ route('chef_equipe.equipes.index') }}" class="btn btn-outline-primary">Accéder <i class="fas fa-arrow-right ms-1"></i></a>
                 </div>
             </div>
         </div>
-        
+
         <!-- Section des statistiques -->
         <div class="stats-section">
             <h3 class="section-title">Aperçu de votre activité</h3>
@@ -78,10 +79,13 @@
                 </div>
             </div>
         </div>
+        
+ 
+       
     </div>
     @endsection
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
     <script>
         // Animation pour les cartes de statistiques
         document.querySelectorAll('.stat-card').forEach(card => {

@@ -23,7 +23,7 @@ class ProjetController extends Controller
             $query->where('nom', 'like', "%{$search}%");
         }
         
-        // Pagination avec 5 projets par page
+        // Pagination / 5 projets par page
         $projets = $query->paginate(5)->withQueryString();
         
         return view('chef_equipe.projets.index', compact('projets'));
@@ -45,11 +45,11 @@ class ProjetController extends Controller
             'statut' => 'required|in:en_attente,en_cours,termine,suspendu',
             'client' => 'nullable|string|max:255',
             'details_importants' => 'nullable|string',
-            'equipe_ids' => 'required|array', // Changer en equipe_ids
-            'equipe_ids.*' => 'exists:equipes,id', // Validation pour chaque ID
+            'equipe_ids' => 'nullable|array', 
+            'equipe_ids.*' => 'exists:equipes,id', 
             'budget' => 'nullable|numeric|min:0',
             'documents' => 'nullable|array',
-            'documents.*' => 'file|max:10240', // 10MB max par fichier
+            'documents.*' => 'file|max:10240', 
         ]);
 
         $validated['created_by'] = auth()->id();
@@ -59,7 +59,10 @@ class ProjetController extends Controller
         $projet = Projet::create($validated);
         
         // Synchroniser les équipes (many-to-many)
-        $projet->equipes()->sync($validated['equipe_ids']);
+        if (!empty($validated['equipe_ids'])) {
+            $projet->equipes()->sync($validated['equipe_ids']);
+        }
+
 
         // Traitement des documents
         if ($request->hasFile('documents')) {
@@ -113,7 +116,7 @@ class ProjetController extends Controller
             'statut' => 'required|in:en_attente,en_cours,termine,suspendu',
             'client' => 'nullable|string|max:255',
             'details_importants' => 'nullable|string',
-            'equipe_ids' => 'required|array', // Changer en equipe_ids
+            'equipe_ids' => 'nullable|array', // Changer en equipe_ids
             'equipe_ids.*' => 'exists:equipes,id', // Validation pour chaque ID
             'budget' => 'nullable|numeric|min:0',
             'documents' => 'nullable|array',
@@ -123,7 +126,12 @@ class ProjetController extends Controller
         $projet->update($validated);
         
         // Synchroniser les équipes
-        $projet->equipes()->sync($validated['equipe_ids']);
+        // $projet->equipes()->sync($validated['equipe_ids']);
+        // Synchroniser les équipes (many-to-many)
+        if (!empty($validated['equipe_ids'])) {
+            $projet->equipes()->sync($validated['equipe_ids']);
+        }
+
 
         // Traitement des nouveaux documents
         if ($request->hasFile('new_documents')) {

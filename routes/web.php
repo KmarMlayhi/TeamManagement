@@ -89,11 +89,25 @@ Route::middleware(['auth', 'isChefEquipe'])->prefix('chef-equipe')->name('chef_e
 
 //Routes Collaborateurs 
 Route::middleware(['auth', 'isCollaborateur'])->group(function () {
+    // Tableau de bord collaborateur
     Route::get('/collaborateur/home', [CollaborateurController::class, 'home'])->name('collaborateur.home');
+
+    // Accès aux équipes (affichage uniquement)
+    Route::get('/collaborateur/equipes', [CollaborateurController::class, 'equipesIndex'])->name('collaborateur.equipes.index');
+    Route::get('/collaborateur/equipes/{equipe}', [CollaborateurController::class, 'equipesShow'])->name('collaborateur.equipes.show');
+
+    // Accès aux projets (affichage uniquement)
+    Route::get('/collaborateur/projets', [CollaborateurController::class, 'index'])->name('collaborateur.projets.index');
+    Route::get('/collaborateur/projets/{projet}', [CollaborateurController::class, 'show'])->name('collaborateur.projets.show');
+
+    // Gérer profil du collaborateur
+    Route::get('/collaborateur/profil', [CollaborateurController::class, 'edit'])->name('collaborateur.profil');
+    Route::put('/collaborateur/profil', [CollaborateurController::class, 'update']);
 });
+
    
 
-    // Formulaire pour demander le lien de réinitialisation
+// Formulaire pour demander le lien de réinitialisation
 Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
 Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
     // Envoi du lien par email

@@ -75,6 +75,7 @@
     color: #6c757d;
 }
 
+
 .btn-outline-danger {
     color: #dc3545;
     border-color: #dc3545;
@@ -105,6 +106,19 @@
 .btn-task-manager:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 5px rgba(0, 86, 179, 0.2);
+}
+
+.btn-custom {
+    color: #003366;
+    border: 1px solid #003366;
+    background-color: transparent;
+}
+
+.btn-custom:hover, 
+.btn-custom:focus {
+    background-color: #003366;
+    color: white;
+    border-color: #003366;
 }
 
 /* Tableaux */

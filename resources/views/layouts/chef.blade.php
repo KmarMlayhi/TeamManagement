@@ -56,7 +56,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profil</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-bell me-2"></i> Notifications</a></li>
+                        {{-- <li><a class="dropdown-item" href="#"><i class="fas fa-bell me-2"></i> Notifications</a></li> --}}
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form method="POST" action="{{ route('logout') }}">
@@ -90,14 +90,16 @@
 
         // Fermer le menu déroulant quand on clique ailleurs
         document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('navbarDropdown');
-            const isClickInsideDropdown = dropdown.contains(event.target);
-            
-            if (!isClickInsideDropdown) {
-                const dropdownMenu = document.querySelector('.dropdown-menu');
-                dropdownMenu.classList.remove('show');
-            }
-        });
+    const dropdownToggle = document.getElementById('navbarDropdown');
+    if (!dropdownToggle) return;
+
+    const dropdownMenu = dropdownToggle.nextElementSibling; // doit être le menu lié
+
+    if (!dropdownToggle.contains(event.target) && !dropdownMenu.contains(event.target)) {
+        dropdownMenu.classList.remove('show');
+    }
+});
+
     </script>
     @yield('scripts')
 </body>

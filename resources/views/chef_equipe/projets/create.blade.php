@@ -33,7 +33,7 @@
         </div>
 
         <div class="card-body">
-            <form action="{{ route('chef_equipe.projets.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('chef_equipe.projets.store') }}" method="POST" enctype="multipart/form-data" id="projectForm">
                 @csrf
 
                 <div class="row mb-4">
@@ -88,12 +88,12 @@
                     <!-- Équipe -->
                     <!-- Équipe responsable (plusieurs équipes possibles) -->
                     <div class="col-12 mb-4">
-                        <label for="equipe_ids" class="form-label required-field">Équipes responsables</label>
+                        <label for="equipe_ids" class="form-label ">Équipes responsables</label>
                         <select class="form-select @error('equipe_ids') is-invalid @enderror" 
                                 id="equipe_ids" 
                                 name="equipe_ids[]" 
                                 multiple="multiple"
-                                required>
+                                >
                             @foreach($equipes as $equipe)
                                 <option value="{{ $equipe->id }}" 
                                     {{ in_array($equipe->id, old('equipe_ids', [])) ? 'selected' : '' }}>
@@ -104,7 +104,10 @@
                         @error('equipe_ids')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <small class="form-text text-muted">Maintenez Ctrl (Windows) ou Cmd (Mac) pour sélectionner plusieurs équipes</small>
+                        <small class="form-text text-muted">
+                            (Optionnel) Vous pouvez assigner une ou plusieurs équipes maintenant, ou le faire plus tard.
+                        </small>
+
                     </div>
 
                     <!-- Budget -->
@@ -124,18 +127,20 @@
                                 id="documents" name="documents[]" multiple 
                                 style="display: none;" 
                                 onchange="updateFileList(this)">
-                            <button class="btn btn-outline-secondary" type="button" 
+                            <button class="btn btn-custom" type="button" 
                                     onclick="document.getElementById('documents').click()">
-                                <i class="fas fa-folder-open"></i> Choisir des fichiers
+                                <i class="fas fa-folder-open me-1"></i> Choisir des fichiers
                             </button>
-                            <input type="text" class="form-control" id="file-list" 
-                                placeholder="Aucun fichier sélectionné" readonly>
                         </div>
+                        <small class="text-muted">Vous pouvez sélectionner plusieurs fichiers (PDF, DOC, DOCX, etc.)</small>
+                         <!-- Zone pour afficher les fichiers sélectionnés -->
+                        <div id="selected-files" class="mt-2 text-muted small"></div>
                         @error('documents')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <small class="text-muted">Vous pouvez sélectionner plusieurs fichiers (PDF, DOC, DOCX, etc.)</small>
+                        
                     </div>
+                    
 
                     <!-- Description -->
                     <div class="col-12 mb-3">
@@ -148,7 +153,7 @@
                 </div>
 
                 <div class="d-flex justify-content-between">
-                    <button type="reset" class="btn btn-outline-danger">
+                    <button type="reset" class="btn btn-outline-danger" id="resetBtn">
                         <i class="fas fa-eraser me-1"></i> Annuler
                     </button>
                     <button type="submit" class="btn btn-primary">
@@ -164,7 +169,8 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(document).ready(function() {
-     $('#equipe_ids').select2({
+    // Initialisation de Select2 pour les équipes
+    $('#equipe_ids').select2({
         placeholder: "Sélectionnez une ou plusieurs équipes",
         allowClear: true,
         width: '100%',
@@ -184,17 +190,39 @@ $(document).ready(function() {
             $(this).val('');
         }
     });
+    
+    // Initialisation de l'affichage des fichiers au chargement
+    const inputFile = document.getElementById('documents');
+    updateFileList(inputFile);
+    
+    // Réinitialisation complète du formulaire
+    $('#resetBtn').click(function() {
+        // Réinitialiser l'affichage des fichiers
+        $('#selected-files').html('<em>Aucun fichier sélectionné</em>');
+        
+        // Réinitialiser le champ fichier
+        $('#documents').val('');
+    });
 });
+
 function updateFileList(input) {
-    const fileList = document.getElementById('file-list');
-    if (input.files.length > 0) {
+    const displayDiv = document.getElementById('selected-files');
+    
+    if (input.files && input.files.length > 0) {
         const files = [];
         for (let i = 0; i < input.files.length; i++) {
             files.push(input.files[i].name);
         }
-        fileList.value = files.join(', ');
+
+        // Affiche les fichiers dans le div
+        displayDiv.innerHTML = `
+            <strong>Fichiers sélectionnés :</strong>
+            <ul class="mb-0">
+                ${files.map(file => `<li>${file}</li>`).join('')}
+            </ul>
+        `;
     } else {
-        fileList.value = 'Aucun fichier sélectionné';
+        displayDiv.innerHTML = '<em>Aucun fichier sélectionné</em>';
     }
 }
 </script>

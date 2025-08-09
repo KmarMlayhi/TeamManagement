@@ -91,8 +91,8 @@
 
                     <!-- Équipes -->
                     <div class="col-12 mb-4">
-                        <label for="equipe_ids" class="form-label required-field">Équipes assignées</label>
-                        <select class="form-select select2-multiple" id="equipe_ids" name="equipe_ids[]" multiple="multiple" required>
+                        <label for="equipe_ids" class="form-label ">Équipes assignées</label>
+                        <select class="form-select select2-multiple" id="equipe_ids" name="equipe_ids[]" multiple="multiple" >
                             @foreach($equipes as $equipe)
                                 <option value="{{ $equipe->id }}" 
                                     {{ in_array($equipe->id, old('equipe_ids', $projet->equipes->pluck('id')->toArray())) ? 'selected' : '' }}>
@@ -134,11 +134,12 @@
                                 onclick="document.getElementById('new_documents').click()">
                             <i class="fas fa-folder-open me-1"></i> Choisir des fichiers
                         </button>
-                        <input type="text" class="form-control" id="file-list" 
-                            placeholder="Aucun fichier sélectionné" readonly>
+                        {{-- <input type="text" class="form-control" id="file-list" 
+                            placeholder="Aucun fichier sélectionné" readonly> --}}
                     </div>
                     <small class="text-muted">Formats acceptés: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (max 10MB chacun)</small>
                 </div>
+                 <div id="selected-files" class="mt-2 text-muted small"></div>
             </div>
                 </div>
 
@@ -200,21 +201,6 @@ $(document).ready(function() {
             });
         }
     });
-
-    // Affichage de la liste des fichiers sélectionnés
-    function updateFileList(input) {
-        const fileList = document.getElementById('file-list');
-        if (input.files.length > 0) {
-            const files = [];
-            for (let i = 0; i < input.files.length; i++) {
-                files.push(input.files[i].name);
-            }
-            fileList.value = files.join(', ');
-        } else {
-            fileList.value = 'Aucun fichier sélectionné';
-        }
-    }
-
     // Fonction pour afficher les notifications
     function showToast(type, message) {
         const toast = `<div class="toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3" role="alert">
@@ -228,5 +214,30 @@ $(document).ready(function() {
         setTimeout(() => $('.toast').remove(), 3000);
     }
 });
+// Affichage de la liste des fichiers sélectionnés
+    function updateFileList(input) {
+            const selectedFilesDiv = document.getElementById('selected-files');
+            selectedFilesDiv.innerHTML = ''; // Réinitialise
+
+            if (input.files.length > 0) {
+                const strong = document.createElement('strong');
+                strong.textContent = 'Fichiers sélectionnés :';
+                selectedFilesDiv.appendChild(strong);
+
+                const ul = document.createElement('ul');
+                ul.classList.add('mb-0', 'ps-3');
+
+                for (let i = 0; i < input.files.length; i++) {
+                    const li = document.createElement('li');
+                    li.textContent = input.files[i].name;
+                    ul.appendChild(li);
+                }
+
+                selectedFilesDiv.appendChild(ul);
+            } else {
+                selectedFilesDiv.textContent = 'Aucun fichier sélectionné';
+            }
+    }
+
 </script>
 @endsection

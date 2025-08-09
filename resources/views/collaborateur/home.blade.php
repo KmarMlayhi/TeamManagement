@@ -1,10 +1,30 @@
+@extends('layouts.collaborateur')
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Collaborateur Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace Chef d'Équipe</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/dashAdmin.css') }}">
 </head>
 <body>
-    <h1>Espace Collaborateur</h1>
-    <p>Bienvenue, {{ Auth::user()->name }} </p>
-</body>
-</html>
+    @section('content')
+    <div class="dashboard-container">
+        <!-- Section de bienvenue -->
+        <div class="welcome-card">
+            <div class="welcome-header">
+                <h1>Espace Collaborateur </h1>
+                <p>Accéder à vos équipes et à vos projets efficacement pour suivez leurs progrès .</p>
+            </div>
+            <div class="mt-3">
+                <span class="user-badge">
+                    <i class="fas fa-user"></i>
+                    Bienvenue {{ Auth::user()->name }} !
+                </span>
+            </div>
+        </div>
+
+     </div>
+    @endsection
