@@ -58,17 +58,20 @@
                     </div>
 
                   <!-- Sélection des membres -->
-<div class="col-12 mb-4">
-    <label for="user_ids" class="form-label required-field">Membres de l'équipe</label>
-    <select class="form-select select2-multiple" id="user_ids" name="user_ids[]" multiple="multiple" required>
-        @foreach($users as $user)
-            <option value="{{ $user->id }}" {{ isset($equipe) && $equipe->utilisateurs->contains($user->id) ? 'selected' : '' }}>
-                {{ $user->name }} ({{ $user->fonction }})
-            </option>
-        @endforeach
-    </select>
-    <small class="form-text text-muted">Sélectionnez un ou plusieurs membres</small>
-</div>
+                    <!-- Sélection des membres -->
+                    <div class="col-12 mb-4">
+                        <label for="user_ids" class="form-label required-field">Membres de l'équipe</label>
+                        <select class="form-select select2-multiple" id="user_ids" name="user_ids[]" multiple="multiple" required>
+                            @foreach($users as $user)
+                                <option value="{{ $user->id }}" 
+                                    {{ isset($equipe) && $equipe->utilisateurs->contains($user->id) ? 'selected' : '' }}>
+                                    {{ $user->name }} ({{ $user->fonction?->nom ?? 'Aucune fonction' }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <small class="form-text text-muted">Sélectionnez un ou plusieurs membres</small>
+                    </div>
+
                 </div>
 
                 <!-- Boutons d'action -->

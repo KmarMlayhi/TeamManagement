@@ -47,7 +47,7 @@
             <table class="table table-hover align-middle table-equipes">
                 <thead class="table-light">
                     <tr>
-                        <th width="80px">Niveau</th>
+                        <th width="80px">Niveau </th>
                         <th>Nom de l'équipe</th>
                         <th width="120px">Sous-équipes</th>
                         <th>Membres</th>
@@ -81,18 +81,23 @@
                             <td>
                                 <div class="members-badges">
                                     @forelse($equipe->utilisateurs as $user)
-                                        <span class="badge bg-light text-dark member-badge" title="{{ $user->name }} - {{ $user->fonction }}">
+                                   
+                                        <span class="badge bg-light text-dark member-badge" 
+                                            title="{{ $user->name }} - {{ $user->fonction?->nom ?? 'Aucune fonction' }}">
                                             <i class="fas fa-user-circle me-1"></i>
-                                            {{ Str::limit($user->name, 10) }}
-                                            @if($user->role === 'chef_equipe')
+                                            {{ $user->name }}
+                                          @if($user->role?->name === 'chef_equipe')
                                                 <i class="fas fa-crown text-warning ms-1"></i>
-                                            @endif
+                                          @endif
+
+                        
                                         </span>
                                     @empty
                                         <span class="text-muted small">Aucun membre</span>
                                     @endforelse
                                 </div>
                             </td>
+
                             <td>
                                 @if($equipe->parent)
                                     <span class="parent-team" title="{{ $equipe->parent->nom }}">

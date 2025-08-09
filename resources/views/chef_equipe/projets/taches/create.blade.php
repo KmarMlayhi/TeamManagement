@@ -68,8 +68,8 @@
                             <option value="">Sélectionnez un membre</option>
                             @foreach($users as $user)
                                 <option value="{{ $user->id }}" 
-                                    {{ old('affecte_a', $tache->affecte_a ?? '') == $user->id ? 'selected' : '' }}>
-                                    {{ $user->name }} ({{ $user->fonction }})
+                                    {{ (old('affecte_a') == $user->id || (isset($tache) && $tache->affecte_a == $user->id)) ? 'selected' : '' }}>
+                                     {{ $user->name }} - {{ $user->fonction?->nom ?? 'Non spécifié' }}
                                 </option>
                             @endforeach
                         </select>

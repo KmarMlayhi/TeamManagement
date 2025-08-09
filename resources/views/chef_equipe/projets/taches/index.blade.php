@@ -85,13 +85,14 @@
                                             </div>
                                             <div>
                                                 <div class="fw-medium">{{ $tache->affecteA->name }}</div>
-                                                <small class="text-muted">{{ $tache->affecteA->fonction }}</small>
+                                                <small class="text-muted">{{ $tache->affecteA->fonction?->nom ?? 'Non spécifié' }}</small>
                                             </div>
                                         </div>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
+
                                 <td>
                                     <div class="d-flex flex-column">
                                         <small class="text-muted"><i class="fas fa-play-circle me-1"></i> {{ $tache->date_debut->format('d/m/Y') }}</small>

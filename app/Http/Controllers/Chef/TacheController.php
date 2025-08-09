@@ -11,12 +11,11 @@ use Illuminate\Support\Facades\Auth;
 
 class TacheController extends Controller
 {
-    public function index(Projet $projet)
+public function index(Projet $projet)
 {
     $taches = $projet->taches()
-        ->with('affecteA');
-    
-    // Vérifiez si la colonne existe avant de trier
+        ->with('affecteA.fonction', 'affecteA.role');  // charger fonction et role
+
     if (Schema::hasColumn('taches', 'ordre')) {
         $taches->orderBy('ordre');
     } else {
@@ -25,15 +24,22 @@ class TacheController extends Controller
 
     $taches = $taches->get();
 
-    return view('chef_equipe.projets.taches.index',[ 'projet' => $projet,
+    return view('chef_equipe.projets.taches.index', [
+        'projet' => $projet,
         'taches' => $taches,
         'priorites' => \App\Models\Tache::PRIORITES,
-        'statuts' => \App\Models\Tache::STATUTS]);
+        'statuts' => \App\Models\Tache::STATUTS
+    ]);
 }
+
 
     public function create(Projet $projet)
     {
-        $users = $projet->equipes->flatMap->utilisateurs->unique();
+        $users = $projet->equipes()
+            ->with('utilisateurs.fonction', 'utilisateurs.role')
+            ->get()
+            ->flatMap->utilisateurs
+            ->unique('id');
         return view('chef_equipe.projets.taches.create',
         ['projet' => $projet,
         'users' => $users,
@@ -65,7 +71,11 @@ class TacheController extends Controller
 
     public function edit(Projet $projet, Tache $tache)
     {
-        $users = $projet->equipes->flatMap->utilisateurs->unique();
+            $users = $projet->equipes()
+            ->with('utilisateurs.fonction', 'utilisateurs.role')
+            ->get()
+            ->flatMap->utilisateurs
+            ->unique('id');
         return view('chef_equipe.projets.taches.edit', [
         'projet' => $projet,
         'tache' => $tache,

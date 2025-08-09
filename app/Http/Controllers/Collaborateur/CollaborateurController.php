@@ -5,10 +5,7 @@ namespace App\Http\Controllers\Collaborateur;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Equipe;
-use App\Models\User;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Schema;
 
 class CollaborateurController extends Controller
 {
@@ -22,7 +19,7 @@ class CollaborateurController extends Controller
     {
         // Récupère l'utilisateur connecté avec ses équipes
         $user = Auth::user()->load('equipes');
-        
+
         return view('collaborateur.equipes.index', [
             'equipes' => $user->equipes
         ]);
@@ -36,9 +33,10 @@ class CollaborateurController extends Controller
             abort(403, "Vous n'avez pas accès à cette équipe");
         }
 
-        // Charge les relations nécessaires
+        // Charge les relations nécessaires, y compris fonction et rôle des utilisateurs
         $equipe->load([
-            'utilisateurs',
+            'utilisateurs.fonction',
+            'utilisateurs.role',
             'projets',
             'parent',
             'children'

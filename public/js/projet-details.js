@@ -125,9 +125,11 @@ $(document).ready(function () {
                             <table class="table table-sm table-striped">
                                 <thead>
                                     <tr>
+                                        <th>Role</th>
                                         <th>Nom</th>
                                         <th>Fonction</th>
                                         <th>Email</th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -137,8 +139,14 @@ $(document).ready(function () {
                         equipe.utilisateurs.forEach((user) => {
                             html += `
                                 <tr>
+                                    <td> ${
+                                        user.role === "chef_equipe"
+                                            ? '<span class="badge bg-warning text-dark">Chef d\'équipe</span>'
+                                            : '<span class="badge bg-primary">Collaborateur</span>'
+                                    }
+                                        </td>
                                     <td>${user.name}</td>
-                                    <td>${user.fonction || "Non spécifié"}</td>
+                                    <td>${user.fonction}</td>
                                     <td>${user.email}</td>
                                 </tr>
                             `;

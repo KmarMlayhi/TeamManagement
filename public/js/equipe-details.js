@@ -85,9 +85,9 @@ $(document).ready(function () {
                     <table class="table table-sm table-striped">
                         <thead>
                             <tr>
+                                <th>Role</th>
                                 <th>Nom</th>
                                 <th>Fonction</th>
-                                <th>Rôle</th>
                                 <th>Email</th>
                             </tr>
                         </thead>
@@ -97,15 +97,15 @@ $(document).ready(function () {
             data.membres.forEach((membre) => {
                 html += `
                     <tr>
-                        <td>${membre.name}</td>
-                        <td>${membre.fonction}</td>
-                        <td>
+                       <td>
                             ${
                                 membre.role === "chef_equipe"
                                     ? '<span class="badge bg-warning text-dark">Chef d\'équipe</span>'
-                                    : '<span class="badge bg-secondary">Membre</span>'
+                                    : '<span class="badge bg-primary">Collaborateur</span>'
                             }
                         </td>
+                        <td>${membre.name}</td>
+                        <td>${membre.fonction}</td>
                         <td>${membre.email}</td>
                     </tr>
                 `;

@@ -14,8 +14,12 @@ class EquipeController extends Controller
 {
     public function index()
     {
-        $query = Equipe::with(['utilisateurs', 'children', 'parent'])
-                 ->latest();
+        $query = Equipe::with([
+            'utilisateurs.fonction',
+            'utilisateurs.role',
+            'children',
+            'parent'
+        ])->latest();
         
         if (Schema::hasColumn('equipes', 'created_by')) {
             $query->where('created_by', Auth::id());
@@ -28,13 +32,14 @@ class EquipeController extends Controller
         return view('chef_equipe.equipes.index', compact('equipes'));
     }
 
+
     public function create()
     {
-        $users = User::where('is_validated', true)->get();
-        $query = Equipe::where('niveau', '<', 4);
-        
+        $users = User::with(['fonction', 'role'])
+                    ->where('is_validated', true)
+                    ->get();
 
-        $equipes = $query->get();
+        $equipes = Equipe::where('niveau', '<', 4)->get();
         
         return view('chef_equipe.equipes.create', compact('users', 'equipes'));
     }
@@ -71,15 +76,16 @@ class EquipeController extends Controller
 
     public function edit($id)
     {
-        $query = Equipe::with('utilisateurs');
+        $equipe = Equipe::with(['utilisateurs.fonction', 'utilisateurs.role'])
+                        ->findOrFail($id);
 
-        $equipe = $query->findOrFail($id);
-        $users = User::where('is_validated', true)->get();
-        
-        $equipesQuery = Equipe::where('id', '!=', $id)
-                            ->where('niveau', '<', 4);
+        $users = User::with(['fonction', 'role'])
+                    ->where('is_validated', true)
+                    ->get();
 
-        $autresEquipes = $equipesQuery->get();
+        $autresEquipes = Equipe::where('id', '!=', $id)
+                            ->where('niveau', '<', 4)
+                            ->get();
 
         return view('chef_equipe.equipes.edit', compact('equipe', 'users', 'autresEquipes'));
     }
@@ -143,8 +149,10 @@ class EquipeController extends Controller
 
     return redirect()->route('chef_equipe.equipes.index')->with('success', 'Équipe supprimée');
 }
-    public function details(Equipe $equipe)
+   public function details(Equipe $equipe)
 {
+    $equipe->load(['utilisateurs.fonction', 'utilisateurs.role', 'children']);
+
     return response()->json([
         'nom' => $equipe->nom,
         'niveau' => $equipe->niveau,
@@ -155,18 +163,19 @@ class EquipeController extends Controller
         'membres' => $equipe->utilisateurs->map(function($user) {
             return [
                 'name' => $user->name,
-                'fonction' => $user->fonction,
-                'role' => $user->role,
+                'fonction' => $user->fonction?->nom ?? null,
+                'role' => $user->role?->name ?? '',
                 'email' => $user->email
             ];
         }),
-         'sous_equipes' => $equipe->children()->withCount('utilisateurs')->get()->map(function($child) {
-        return [
-            'nom' => $child->nom,
-            'niveau' => $child->niveau, // Ajout du niveau
-            'membres_count' => $child->utilisateurs_count
-        ];
-    })
+        'sous_equipes' => $equipe->children()->withCount('utilisateurs')->get()->map(function($child) {
+            return [
+                'nom' => $child->nom,
+                'niveau' => $child->niveau,
+                'membres_count' => $child->utilisateurs_count
+            ];
+        })
     ]);
 }
+
 }

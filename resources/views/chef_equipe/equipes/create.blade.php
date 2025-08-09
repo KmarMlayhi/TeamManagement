@@ -78,9 +78,9 @@
                                 id="user_ids" name="user_ids[]" multiple="multiple" required>
                             @foreach($users as $user)
                                 <option value="{{ $user->id }}" {{ in_array($user->id, old('user_ids', [])) ? 'selected' : '' }}>
-                                    {{ $user->name }} ({{ $user->fonction }})
-                                    @if($user->role === 'chef_equipe')
-                                        <i class="fas fa-star text-warning ms-1" title="Chef d'équipe"></i>
+                                    {{ $user->name }} ({{ $user->fonction?->nom ?? 'Aucune fonction' }})
+                                    @if($user->role?->name === 'chef_equipe')
+                                        - Chef d'équipe
                                     @endif
                                 </option>
                             @endforeach

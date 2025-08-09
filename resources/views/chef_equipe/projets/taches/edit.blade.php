@@ -53,12 +53,11 @@
                             @foreach($users as $user)
                                 <option value="{{ $user->id }}" 
                                     {{ old('affecte_a', $tache->affecte_a) == $user->id ? 'selected' : '' }}>
-                                    {{ $user->name }} - {{ $user->fonction }}
+                                    {{ $user->name }} - {{ $user->fonction?->nom ?? 'Non spécifié' }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
-
                     <div class="col-12 mb-3">
                         <label for="description" class="form-label">Description</label>
                         <textarea class="form-control" id="description" name="description" 

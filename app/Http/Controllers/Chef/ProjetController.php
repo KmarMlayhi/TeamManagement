@@ -190,7 +190,10 @@ public function details(Projet $projet)
 {
     // Charger les relations
     $projet->load([
-        'equipes.utilisateurs:id,name,email,fonction', // si tu veux aussi les utilisateurs
+        'equipes.utilisateurs:id,name,email,role_id,fonction_id',
+        'equipes.utilisateurs.role',
+        'equipes.utilisateurs.fonction',
+        'equipes.utilisateurs.grade',
         'documents',
     ]);
 
@@ -216,7 +219,8 @@ public function details(Projet $projet)
                         'id' => $user->id,
                         'name' => $user->name,
                         'email' => $user->email,
-                        'fonction' => $user->fonction,
+                        'fonction' => $user->fonction?->nom ?? null,
+                        'role' => $user->role?->name ?? null,
                     ];
                 }),
             ];
