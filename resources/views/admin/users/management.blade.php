@@ -131,36 +131,19 @@
                     <table class="user-management-table">
                         <thead>
                             <tr>
+                                <th>Statut</th>
                                 <th>Grade</th>
                                 <th>Nom</th>
                                 <th>Email</th>
+                                <th>Fonction</th>
                                 <th>Rôle</th>
-                                <th>Statut</th>
                                 <th>Inscription</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($users as $user)
-                                <tr>
-                                    <td>{{ $user->grade }}</td>
-                                    <td>{{ $user->name }}</td>
-                                    <td>{{ $user->email }}</td>
-                                    <td>
-                                        @if($user->role === 'chef_equipe')
-                                            <span class="badge badge-chef">
-                                                <i class="fas fa-user-tie me-1"></i> Chef d'Équipe
-                                            </span>
-                                        @elseif($user->role === 'admin')
-                                            <span class="badge badge-admin">
-                                                <i class="fas fa-user-shield me-1"></i> Admin
-                                            </span>
-                                        @else
-                                            <span class="badge badge-collaborator">
-                                                <i class="fas fa-user me-1"></i> Collaborateur
-                                            </span>
-                                        @endif
-                                    </td>
+                                <tr>   
                                     <td>
                                         @if($user->is_validated)
                                             <span class="status-badge status-validated">
@@ -172,10 +155,36 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
+                                    <td>{{ $user->grade ? $user->grade->nom : 'Aucun grade' }}</td>
+                                    <td>{{ $user->name }}</td>
+                                    <td>{{ $user->email }}</td>
+                                    <td>{{ $user->fonction ? $user->fonction->nom : 'Aucun grade' }}</td>
+                                    <td>
+                                        @php $roleName = $user->role?->name ?? 'inconnu'; @endphp
+
+                                        @if($roleName === 'chef_equipe')
+                                            <span class="badge badge-chef">
+                                                <i class="fas fa-user-tie me-1"></i> Chef d'Équipe
+                                            </span>
+                                        @elseif($roleName === 'admin')
+                                            <span class="badge badge-admin">
+                                                <i class="fas fa-user-shield me-1"></i> Admin
+                                            </span>
+                                        @elseif($roleName === 'collaborateur')
+                                            <span class="badge badge-collaborator">
+                                                <i class="fas fa-user me-1"></i> Collaborateur
+                                            </span>
+                                        @else
+                                            <span class="badge badge-secondary">
+                                                {{ ucfirst($roleName) }}
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td> {{ $user->created_at->format('d/m/Y') }}<br>
+    {{ $user->created_at->format('H:i') }}</td>
                                     <td>
                                         <div class="action-buttons">
-                                            @if(!$user->is_validated && $user->role !== 'admin')
+                                            @if(!$user->is_validated && $roleName !== 'admin')
                                                 <form action="{{ route('admin.users.validate', $user) }}" method="POST">
                                                     @csrf
                                                     <button type="submit" class="btn btn-validate" title="Valider">
@@ -183,7 +192,7 @@
                                                     </button>
                                                 </form>
                                             @endif
-                                             @if($user->is_validated && $user->role !== 'admin')
+                                            @if($user->is_validated && $roleName !== 'admin')
                                                 <form action="{{ route('admin.users.suspend', $user) }}" method="POST">
                                                     @csrf
                                                     <button type="submit" class="btn btn-sm btn-warning" title="Suspendre">
@@ -191,10 +200,10 @@
                                                     </button>
                                                 </form>
                                             @endif
-                                            @if($user->role !== 'admin')
+                                            @if($roleName !== 'admin')
                                                 <form action="{{ route('admin.users.delete', $user) }}" method="POST">
                                                     @csrf @method('DELETE')
-                                                    <button type="submit" class="btn btn-delete"   title="Supprimer"
+                                                    <button type="submit" class="btn btn-delete" title="Supprimer"
                                                         onclick="return confirm('Confirmer la suppression de {{ $user->name }} ?')">
                                                         <i class="fas fa-trash-alt"></i>
                                                     </button>

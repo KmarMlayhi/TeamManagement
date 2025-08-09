@@ -10,7 +10,7 @@ class IsCollaborateur
 {
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check() && Auth::user()->role === 'collaborateur') {
+        if (Auth::check() && Auth::user()->role && Auth::user()->role->name === 'collaborateur') {
             return $next($request);
         }
         

@@ -12,36 +12,39 @@ class LoginController extends Controller
         return view('auth.login'); 
     }
 
- public function login(Request $request)
-{
-    $credentials = $request->validate([
-        'email' => ['required', 'email'],
-        'password' => ['required'],
-    ]);
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email'    => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-    if (Auth::attempt($credentials)) {
-        $user = Auth::user();
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            $roleName = $user->role->name ?? null;
 
-        // Si collaborateur non validé
-        if ($user->role === 'collaborateur' && !$user->is_validated) {
-            Auth::logout(); // déconnexion immédiate
-            return back()->withErrors([
-                'email' => 'Votre compte est en attente de validation.',
-            ]);
+            // Bloquer si collaborateur ou chef_equipe non validé
+            if (in_array($roleName, ['collaborateur', 'chef_equipe']) && !$user->is_validated) {
+                Auth::logout(); // déconnexion immédiate
+                return back()->withErrors([
+                    'email' => 'Votre compte est en attente de validation.',
+                ]);
+            }
+
+            // Redirection selon rôle
+            return match ($roleName) {
+                'admin'        => redirect()->intended('/admin/home'),
+                'chef_equipe'  => redirect()->intended('/chef-equipe/dashboard'),
+                'collaborateur'=> redirect()->intended('/collaborateur/home'),
+                default        => redirect()->intended('/'),
+            };
         }
 
-        // Redirection selon rôle
-        return match ($user->role) {
-            'admin'         => redirect()->intended('/admin/home'),
-            'chef_equipe'  => redirect()->intended('/chef-equipe/dashboard'),
-            default         => redirect()->intended('/collaborateur/home'),
-        };
+        return back()->withErrors([
+            'email' => 'Identifiants invalides.',
+        ]);
     }
 
-    return back()->withErrors([
-        'email' => 'Identifiants invalides.',
-    ]);
-}
 
     public function logout(Request $request)
     {
