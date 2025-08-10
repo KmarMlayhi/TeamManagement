@@ -113,7 +113,7 @@
     }
     
     .team-icon-access {
-        background: var(--primary-color);
+        background: var(--secondary-color);
         color: white;
         width: 50px;
         height: 50px;

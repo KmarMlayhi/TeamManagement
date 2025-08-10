@@ -99,7 +99,12 @@ Route::middleware(['auth', 'isCollaborateur'])->group(function () {
     // Accès aux projets (affichage uniquement)
     Route::get('/collaborateur/projets', [CollaborateurController::class, 'index'])->name('collaborateur.projets.index');
     Route::get('/collaborateur/projets/{projet}', [CollaborateurController::class, 'show'])->name('collaborateur.projets.show');
-
+    Route::get('/collaborateur/projets/{projet}/details', [CollaborateurController::class, 'projetDetails']);
+    Route::get('/collaborateur/projets/{projet}/taches', [CollaborateurController::class, 'projetTaches'])
+     ->name('collaborateur.projets.taches');
+    
+    Route::get('/collaborateur/taches/{tache}', [CollaborateurController::class, 'showTache'])
+     ->name('collaborateur.taches.show');
     // Gérer profil du collaborateur
     Route::get('/collaborateur/profil', [CollaborateurController::class, 'edit'])->name('collaborateur.profil');
     Route::put('/collaborateur/profil', [CollaborateurController::class, 'update']);

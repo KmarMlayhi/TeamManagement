@@ -135,7 +135,7 @@
                                 <th>Grade</th>
                                 <th>Nom</th>
                                 <th>Email</th>
-                                <th>Fonction</th>
+                                <th>Direction</th>
                                 <th>Rôle</th>
                                 <th>Inscription</th>
                                 <th>Actions</th>
@@ -158,7 +158,7 @@
                                     <td>{{ $user->grade ? $user->grade->nom : 'Aucun grade' }}</td>
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->email }}</td>
-                                    <td>{{ $user->fonction ? $user->fonction->nom : 'Aucun grade' }}</td>
+                                    <td>{{ $user->direction ? $user->direction->nom : 'Aucune direction' }}</td>
                                     <td>
                                         @php $roleName = $user->role?->name ?? 'inconnu'; @endphp
 

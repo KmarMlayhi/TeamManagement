@@ -1,0 +1,221 @@
+
+        :root {
+            --primary-color: #0056b3;
+            --primary-hover: #004494;
+            --secondary-color: #003366;
+            --accent-color: #e30613;
+            --light-gray: #f8f9fa;
+            --light-bg: #f8f9fa;
+            --border-color: #e0e6ed;
+            --text-color: #212529;
+            --text-muted: #6c757d;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+        }
+        
+        .detail-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .titre-principal {
+            color: var(--secondary-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-item {
+            padding: 1rem;
+            background: var(--light-gray);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        }
+        
+        .info-label {
+            font-weight: 500;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .info-value {
+            font-size: 1.05rem;
+            color: var(--text-color);
+        }
+        
+        /* Styles des cartes */
+        .team-card-access {
+            background: white;
+            border-radius: 8px;
+            padding: 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            border-top: 3px solid var(--primary-color);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1rem;
+        }
+        
+        .member-item, .project-item, .subteam-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+            background: var(--light-gray);
+        }
+        
+        .avatar-sm {
+            width: 42px;
+            height: 42px;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .member-info {
+            flex: 1;
+        }
+        
+        .member-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .member-function {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .member-email {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .project-icon, .subteam-icon {
+            background: rgba(41, 128, 185, 0.1);
+            color: #2980b9;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-size: 1.2rem;
+        }
+        
+        .subteam-icon {
+            background: rgba(155, 89, 182, 0.1);
+            color: #9b59b6;
+        }
+        
+        .project-name, .subteam-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .no-items {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            border-radius: 8px;
+            background: var(--light-gray);
+            margin: 1rem 0;
+        }
+        
+        .no-items i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #cbd5e0;
+        }
+        
+        /* Nouveau style pour le badge niveau */
+        .badge-niveau {
+            background: var(--secondary-color);
+            color: white;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .card-header {
+            background-color: white !important;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: left;
+            justify-content: space-between;
+        }
+        
+        .list-container {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+       .breadcrumb-container {
+    background-color: white;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;}
+
+        .breadcrumb {
+            padding: 0;
+            margin: 0;
+            background-color: transparent;
+        }
+
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .row-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .detail-container {
+                padding: 1rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .row-cards {
+                grid-template-columns: 1fr;
+            }
+        }
