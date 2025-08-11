@@ -139,6 +139,95 @@ class CollaborateurController extends Controller
     }
 
     public function projetTaches(Projet $projet)
+    {
+        $user = Auth::user();
+        $equipeId = request('equipe_id');
+
+        // Trouver l'équipe spécifique que l'utilisateur a sélectionnée
+        $equipe = $projet->equipes()
+            ->whereIn('id', $user->equipes->pluck('id'))
+            ->where('id', $equipeId)
+            ->first();
+
+        if (!$equipe) {
+            abort(403, "Vous n'avez pas accès à cette équipe");
+        }
+
+        // Récupérer les tâches POUR CETTE ÉQUIPE SPÉCIFIQUE via la relation utilisateur
+        $taches = Tache::where('projet_id', $projet->id)
+            ->where('affecte_a', $user->id)
+            ->whereHas('affecteA', function ($query) use ($equipeId) {
+                $query->whereHas('equipes', function ($q) use ($equipeId) {
+                    $q->where('equipes.id', $equipeId);
+                });
+            })
+            ->with(['projet', 'affecteA'])
+            ->orderBy('date_fin_prevue', 'asc')
+            ->get();
+
+        return view('collaborateur.taches.index', compact('taches', 'projet', 'equipe'));
+}
+    public function showTache(Tache $tache)
+    {
+        $user = Auth::user();
+        
+        // Vérifier que l'utilisateur est bien assigné à cette tâche
+        if ($tache->affecte_a !== $user->id) {
+            abort(403, "Vous n'êtes pas assigné à cette tâche");
+        }
+
+        // Trouver l'équipe associée à la tâche et au projet que l'utilisateur peut voir
+        $equipe = $tache->projet->equipes()
+            ->whereIn('id', $user->equipes->pluck('id'))
+            ->first();
+
+        if (!$equipe) {
+            abort(403, "Vous n'avez pas accès à ce projet");
+        }
+
+        return view('collaborateur.taches.show', compact('tache', 'equipe'));
+    }
+// Mettre à jour le statut d'une tâche
+    public function updateStatut(Request $request, Tache $tache)
+    {
+            // Vérifier que l'utilisateur est bien assigné à cette tâche
+            if ($tache->affecte_a !== Auth::id()) {
+                abort(403, "Vous n'êtes pas assigné à cette tâche");
+            }
+
+            $request->validate([
+                'statut' => 'required|in:a_faire,en_cours,termine'
+            ]);
+
+            $tache->update([
+                'statut' => $request->statut,
+                'date_fin_reelle' => $request->statut === 'termine' ? now() : null
+            ]);
+
+            return redirect()->back()->with('success', 'Statut de la tâche mis à jour avec succès');
+    }
+    public function updateStatutKanban(Request $request)
+{
+    $request->validate([
+        'tache_id' => 'required|exists:taches,id',
+        'statut' => 'required|in:a_faire,en_cours,termine'
+    ]);
+    
+    $tache = Tache::findOrFail($request->tache_id);
+
+    // Vérifier que l'utilisateur est bien assigné à cette tâche
+    if ($tache->affecte_a !== Auth::id()) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    $tache->update([
+        'statut' => $request->statut,
+        'date_fin_reelle' => $request->statut === 'termine' ? now() : null
+    ]);
+
+    return response()->json(['success' => true]);
+}
+    public function projetTachesKanban(Projet $projet)
 {
     $user = Auth::user();
     $equipeId = request('equipe_id');
@@ -162,18 +251,24 @@ class CollaborateurController extends Controller
             });
         })
         ->with(['projet', 'affecteA'])
-        ->orderBy('date_fin_prevue', 'asc')
         ->get();
 
-    return view('collaborateur.taches.index', compact('taches', 'projet', 'equipe'));
-}
-    public function showTache(Tache $tache)
-    {
-        // Vérifier que l'utilisateur est bien assigné à cette tâche
-        if ($tache->affecte_a !== Auth::id()) {
-            abort(403, "Vous n'êtes pas assigné à cette tâche");
-        }
-
-        return view('collaborateur.taches.show', compact('tache'));
+    // Organiser les tâches par statut
+    $statuts = Tache::STATUTS;
+    $priorites = Tache::PRIORITES;
+    
+    $tachesGrouped = [];
+    foreach ($statuts as $key => $label) {
+        $tachesGrouped[$key] = $taches->where('statut', $key)->all();
     }
+
+    return view('collaborateur.taches.kanban', [
+        'projet' => $projet,
+        'equipe' => $equipe,
+        'taches' => $tachesGrouped,
+        'statuts' => $statuts,
+        'priorites' => $priorites
+    ]);
+}
+
 }

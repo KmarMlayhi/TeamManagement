@@ -102,9 +102,21 @@ Route::middleware(['auth', 'isCollaborateur'])->group(function () {
     Route::get('/collaborateur/projets/{projet}/details', [CollaborateurController::class, 'projetDetails']);
     Route::get('/collaborateur/projets/{projet}/taches', [CollaborateurController::class, 'projetTaches'])
      ->name('collaborateur.projets.taches');
-    
     Route::get('/collaborateur/taches/{tache}', [CollaborateurController::class, 'showTache'])
      ->name('collaborateur.taches.show');
+    Route::put('/collaborateur/taches/{tache}/statut', [CollaborateurController::class, 'updateStatut'])
+    ->name('collaborateur.taches.updateStatut');
+
+    // Vue Kanban des tâches pour collaborateur
+    Route::get('/collaborateur/projets/{projet}/taches/kanban', [CollaborateurController::class, 'projetTachesKanban'])
+    ->name('collaborateur.projets.taches.kanban');
+    // Route pour la mise à jour du statut via Kanban
+   // Avant (avec paramètre)
+// Route::post('/collaborateur/taches/{tache}/update-statut-kanban', ...)
+
+// Après (sans paramètre)
+    Route::post('/collaborateur/taches/update-statut-kanban', [CollaborateurController::class, 'updateStatutKanban'])
+        ->name('collaborateur.taches.updateStatutKanban');
     // Gérer profil du collaborateur
     Route::get('/collaborateur/profil', [CollaborateurController::class, 'edit'])->name('collaborateur.profil');
     Route::put('/collaborateur/profil', [CollaborateurController::class, 'update']);
