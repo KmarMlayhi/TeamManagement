@@ -53,4 +53,12 @@
     }
 }
 
-/* pour le kanban du collaborateur all projects 
+
+.empty-state {
+text-align: center;
+padding: 30px 15px;
+color: var(--text-muted);
+background-color: rgba(0,0,0,0.02);
+ border-radius: 8px;
+margin: 10px;
+}

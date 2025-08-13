@@ -75,5 +75,13 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
+    public function commentairesEnvoyes()
+    {
+        return $this->hasMany(Commentaire::class, 'auteur_id');
+    }
 
+    public function commentairesRecus()
+    {
+        return $this->hasMany(Commentaire::class, 'destinataire_id');
+    }
 }

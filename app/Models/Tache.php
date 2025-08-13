@@ -46,5 +46,9 @@ class Tache extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-    
+    public function commentaires()
+    {
+        return $this->hasMany(Commentaire::class);
+    }
+
 }

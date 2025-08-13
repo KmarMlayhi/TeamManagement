@@ -4,6 +4,7 @@
 
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/team.css') }}">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
     .tache-detail-container {
         max-width: 1200px;
@@ -202,6 +203,24 @@
         align-items: center;
         gap: 5px;
 }
+.assignee-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.dropdown-toggle::after {
+    display: none;
+}
+
+.comment-content {
+    white-space: pre-line;
+}
 </style>
 
 <div class="tache-detail-container">
@@ -275,13 +294,6 @@
                         <h5 class="mb-3"><i class="fas fa-align-left me-2"></i>Description</h5>
                         <div class="description-content">
                             {{ $tache->description ?: "Aucune description fournie" }}
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <h5 class="mb-3"><i class="fas fa-list-check me-2"></i>Commentaires</h5>
-                        <div class="description-content">
-                            {{ $tache->instructions ?: "Aucun commentaire spécifique." }}
                         </div>
                     </div>
                 </div>
@@ -409,83 +421,258 @@
             </ul>
         </div>
         <div class="card-body">
-            <div class="tab-content" id="tacheTabsContent">
-                <div class="tab-pane fade show active" id="commentaires" role="tabpanel">
-                    <div class="feature-coming">
-                        <div class="feature-icon">
-                            <i class="fas fa-comments"></i>
-                        </div>
-                        <h4 class="mb-3">Fonctionnalité à venir</h4>
-                        <p class="text-muted mb-4">
-                            La section de commentaires vous permettra bientôt de discuter de cette tâche 
-                            avec votre chef d'équipe et vos collègues.
-                        </p>
-                        <div class="alert alert-light">
-                            <i class="fas fa-lightbulb me-2"></i>
-                            Pour toute question urgente, contactez votre chef d'équipe par email.
-                        </div>
-                    </div>
+    <div class="tab-content" id="tacheTabsContent">
+        <div class="tab-pane fade show active" id="commentaires" role="tabpanel">
+            <div class="feature-coming">
+                <div id="commentaires-container">
+                    <div id="liste-commentaires"></div>
                 </div>
-                <div class="tab-pane fade" id="soumission" role="tabpanel">
-                    <div class="feature-coming">
-                        <div class="feature-icon">
-                            <i class="fas fa-file-upload"></i>
-                        </div>
-                        <h4 class="mb-3">Fonctionnalité à venir</h4>
-                        <p class="text-muted mb-4">
-                            Bientôt, vous pourrez soumettre votre travail directement depuis cette page 
-                            et suivre l'avancement de votre tâche.
-                        </p>
-                        <div class="alert alert-light">
-                            <i class="fas fa-lightbulb me-2"></i>
-                            En attendant, vous pouvez envoyer votre travail par email à votre chef d'équipe.
-                        </div>
-                    </div>
+
+                    @if(Auth::id() === $tache->created_by || Auth::id() === $tache->affecte_a)
+                    <form id="form-commentaire">
+                        @csrf
+                        <textarea name="contenu" class="form-control mb-2" placeholder="Écrire un commentaire..." required></textarea>
+                        <button type="submit" class="btn btn-primary btn-sm">Envoyer</button>
+                    </form>
+                    @endif
                 </div>
-                <div class="tab-pane fade" id="historique" role="tabpanel">
-                    <div class="feature-coming">
-                        <div class="feature-icon">
-                            <i class="fas fa-history"></i>
-                        </div>
-                        <h4 class="mb-3">Fonctionnalité à venir</h4>
-                        <p class="text-muted mb-4">
-                            L'historique des modifications vous montrera bientôt toutes les actions 
-                            effectuées sur cette tâche depuis sa création.
-                        </p>
-                    </div>
+            </div>
+           
+        </div>
+
+        <div class="tab-pane fade" id="soumission" role="tabpanel">
+            <div class="feature-coming">
+                <div class="feature-icon">
+                    <i class="fas fa-file-upload"></i>
                 </div>
+                <h4 class="mb-3">Fonctionnalité à venir</h4>
+                <p class="text-muted mb-4">
+                    Bientôt, vous pourrez soumettre votre travail directement depuis cette page 
+                    et suivre l'avancement de votre tâche.
+                </p>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="historique" role="tabpanel">
+            <div class="feature-coming">
+                <div class="feature-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h4 class="mb-3">Fonctionnalité à venir</h4>
+                <p class="text-muted mb-4">
+                    L'historique des modifications vous montrera bientôt toutes les actions 
+                    effectuées sur cette tâche depuis sa création.
+                </p>
             </div>
         </div>
     </div>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Gestion du sélecteur de statut
-    const statusOptions = document.querySelectorAll('.status-option');
-    const selectedStatusInput = document.getElementById('selectedStatus');
-    
-    statusOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            // Retirer la classe active de toutes les options
-            statusOptions.forEach(opt => opt.classList.remove('active'));
-            
-            // Ajouter la classe active à l'option sélectionnée
-            this.classList.add('active');
-            
-            // Mettre à jour la valeur cachée
-            selectedStatusInput.value = this.getAttribute('data-value');
-        });
-    });
-    
-    // Confirmation pour le statut "Terminé"
-    const statusForm = document.getElementById('statusForm');
-    statusForm.addEventListener('submit', function(e) {
-        if (selectedStatusInput.value === 'termine') {
-            if (!confirm('Êtes-vous sûr de vouloir marquer cette tâche comme terminée ?')) {
-                e.preventDefault();
+    const tacheId = {{ $tache->id }};
+    const userId = {{ Auth::id() }};
+    const isAdmin = userId === {{ $tache->created_by }};
+    const listeCommentaires = document.getElementById('liste-commentaires');
+    const formCommentaire = document.getElementById('form-commentaire');
+    const textarea = formCommentaire ? formCommentaire.querySelector('textarea[name="contenu"]') : null;
+
+    function formatDate(dateString) {
+        const options = { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric',
+            hour: '2-digit', 
+            minute: '2-digit'
+        };
+        return new Date(dateString).toLocaleString('fr-FR', options);
+    }
+
+    async function loadCommentaires() {
+        try {
+            const response = await fetch(`/collaborateur/taches/${tacheId}/commentaires`);
+            if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+            const data = await response.json();
+
+            if (!data.success || !Array.isArray(data.commentaires)) {
+                listeCommentaires.innerHTML = `<div class="alert alert-info">Aucun commentaire pour l'instant.</div>`;
+                return;
             }
+
+            const commentaires = data.commentaires;
+            if (commentaires.length === 0) {
+                listeCommentaires.innerHTML = `<div class="alert alert-info">Aucun commentaire pour l'instant.</div>`;
+                return;
+            }
+
+            listeCommentaires.innerHTML = commentaires.map(c => {
+                const auteurName = c.auteur?.name || 'Utilisateur inconnu';
+                const destinataireName = c.destinataire?.name || 'Toute l\'équipe';
+                const auteurInitial = auteurName.charAt(0).toUpperCase();
+                const isAuthor = c.auteur_id === userId;
+                const canEdit = isAuthor || isAdmin;
+                const editTime = c.edited_at ? `<small class="text-muted d-block mt-1">Modifié le ${formatDate(c.edited_at)}</small>` : '';
+
+                return `
+                    <div class="card mb-3" data-comment-id="${c.id}">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="assignee-avatar me-2" title="${auteurName}">
+                                    ${auteurInitial}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <strong>${auteurName}</strong>
+                                    <span class="text-muted small">→ ${destinataireName}</span>
+                                </div>
+                                <small class="text-muted">${formatDate(c.created_at)}</small>
+                                ${canEdit ? `
+                                <div class="dropdown ms-2">
+                                    <button class="btn btn-sm btn-link text-muted dropdown-toggle" 
+                                            type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        ${isAuthor ? `
+                                        <li>
+                                            <button class="dropdown-item edit-comment" 
+                                                    data-comment-id="${c.id}">
+                                                <i class="fas fa-edit me-2"></i>Modifier
+                                            </button>
+                                        </li>` : ''}
+                                        <li>
+                                            <button class="dropdown-item delete-comment text-danger"
+                                                    data-comment-id="${c.id}">
+                                                <i class="fas fa-trash me-2"></i>Supprimer
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>` : ''}
+                            </div>
+                            <p class="mb-0 comment-content">${c.contenu}</p>
+                            ${editTime}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            setupCommentActions();
+
+        } catch (error) {
+            console.error('Erreur:', error);
+            listeCommentaires.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
         }
-    });
+    }
+
+    function setupCommentActions() {
+        // Suppression
+        document.querySelectorAll('.delete-comment').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const commentId = this.dataset.commentId;
+                if (!confirm('Voulez-vous vraiment supprimer ce commentaire ?')) return;
+
+                try {
+                    const response = await fetch(`/collaborateur/taches/${tacheId}/${commentId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    if (!response.ok) throw new Error('Erreur lors de la suppression');
+                    await loadCommentaires();
+                } catch (error) {
+                    console.error(error);
+                    alert(error.message);
+                }
+            });
+        });
+
+        // Modification
+        document.querySelectorAll('.edit-comment').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const commentId = this.dataset.commentId;
+                const commentCard = document.querySelector(`[data-comment-id="${commentId}"]`);
+                const content = commentCard.querySelector('.comment-content').textContent;
+
+                commentCard.innerHTML = `
+                    <div class="card-body">
+                        <form class="edit-comment-form" data-comment-id="${commentId}">
+                            <textarea class="form-control mb-2" required>${content}</textarea>
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary cancel-edit">
+                                    Annuler
+                                </button>
+                                <button type="submit" class="btn btn-sm btn-primary">
+                                    Enregistrer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+
+                commentCard.querySelector('.cancel-edit').addEventListener('click', async () => {
+                    await loadCommentaires();
+                });
+
+                commentCard.querySelector('.edit-comment-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const newContent = e.target.querySelector('textarea').value.trim();
+                    if (!newContent) return alert('Le commentaire ne peut pas être vide');
+
+                    try {
+                        const response = await fetch(`/collaborateur/taches/${tacheId}/${commentId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({ contenu: newContent })
+                        });
+                        if (!response.ok) throw new Error('Erreur lors de la modification');
+                        await loadCommentaires();
+                    } catch (error) {
+                        console.error(error);
+                        alert(error.message);
+                    }
+                });
+            });
+        });
+    }
+
+    // Ajouter un nouveau commentaire
+    if(formCommentaire) {
+        formCommentaire.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const content = textarea.value.trim();
+            if (!content) return alert('Veuillez écrire un commentaire');
+
+            try {
+                const response = await fetch(`/collaborateur/taches/${tacheId}/commentaires`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ contenu: content })
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Erreur serveur');
+                }
+                textarea.value = '';
+                await loadCommentaires();
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert(error.message || 'Erreur lors de l\'envoi du commentaire');
+            }
+        });
+    }
+
+    loadCommentaires();
 });
+
 </script>
+
 @endsection

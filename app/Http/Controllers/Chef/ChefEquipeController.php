@@ -56,4 +56,47 @@ class ChefEquipeController extends Controller
         ->where('statut', 'en_cours')
         ->count();
     }
+
+    public function suivi()
+    {
+        $userId = Auth::id();
+
+        // Récupérer tous les projets du chef d'équipe
+        $projets = Projet::whereHas('equipes.utilisateurs', function($q) use ($userId) {
+            $q->where('users.id', $userId);
+        })->get();
+
+        return view('chef_equipe.suivi', compact('projets'));
+    }
+
+    public function kanbanProjet(Projet $projet)
+    {
+        $userId = Auth::id();
+
+        // Vérifier que l'utilisateur est bien membre du projet
+        $estMembre = $projet->equipes()->whereHas('utilisateurs', function($q) use ($userId) {
+            $q->where('users.id', $userId);
+        })->exists();
+
+        if (!$estMembre) {
+            abort(403, 'Accès non autorisé');
+        }
+
+        // Charger les tâches par statut
+        $tachesCollection = Tache::where('projet_id', $projet->id)
+            ->with('affecteA')
+            ->get()
+            ->groupBy('statut');
+
+        $statuts = Tache::STATUTS;
+        $priorites = Tache::PRIORITES;
+
+        return view('chef_equipe.kanban', [
+            'projet' => $projet,
+            'taches' => $tachesCollection,
+            'statuts' => $statuts,
+            'priorites' => $priorites,
+        ]);
+    }
+
 }

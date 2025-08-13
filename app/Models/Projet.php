@@ -61,4 +61,9 @@ class Projet extends Model
             'suspendu' => 'warning',
         ][$this->statut];
     }
+    public function commentaires()
+    {
+        return $this->hasMany(Commentaire::class);
+    }
+
 }

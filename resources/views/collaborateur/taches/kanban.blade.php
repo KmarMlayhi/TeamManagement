@@ -119,11 +119,10 @@
                         @endforeach
 
                         @if(empty($taches[$statusKey]))
-                        <div class="text-center py-4 text-muted">
-                            <i class="fas fa-tasks fa-2x mb-2"></i>
-                            <p>Aucune tâche dans cette colonne</p>
-                         
-                        </div>
+                          <div class="empty-state">
+                          <i class="fas fa-clipboard-list fa-2x mb-2"></i>
+                          <p>Aucune tâche dans cette colonne</p>
+                          </div>
                         @endif
                     </div>
                 </div>

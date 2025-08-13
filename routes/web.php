@@ -11,10 +11,13 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Chef\TacheController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Chef\ProjetController;
+use App\Http\Controllers\Chef\ChefEquipeCommentaireController;
 use App\Http\Controllers\Collaborateur\CollaborateurController;
+use App\Http\Controllers\Collaborateur\TacheCommentaireController;
 use App\Http\Controllers\Chef\ChefEquipeController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
+
 
 
 
@@ -42,10 +45,13 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
 
 
  // Routes Chef 
-Route::middleware(['auth', 'isChefEquipe'])->prefix('chef-equipe')->name('chef_equipe.')->group(function () {
+Route::middleware(['auth', 'isChefEquipe'])
+->prefix('chef-equipe')
+->name('chef_equipe.')
+->group(function () {
     // Dashboard
     Route::get('/dashboard', [ChefEquipeController::class, 'dashboard'])->name('dashboard');
-    
+
     // Gestion des équipes
     Route::prefix('equipes')->name('equipes.')->group(function () {
         Route::get('/', [EquipeController::class, 'index'])->name('index');
@@ -85,6 +91,24 @@ Route::middleware(['auth', 'isChefEquipe'])->prefix('chef-equipe')->name('chef_e
     });
     Route::delete('documents/{document}', [ProjetController::class, 'destroyDocument'])
                 ->name('documents.destroy');
+
+    Route::get('/commentaires', [ChefEquipeCommentaireController::class, 'index'])
+        ->name('commentaires');
+
+    Route::post('/commentaires/{commentaire}/repondre', [ChefEquipeCommentaireController::class, 'repondre'])
+        ->name('commentaires.repondre');
+
+    Route::delete('/commentaires/{commentaire}', [ChefEquipeCommentaireController::class, 'destroy'])
+        ->name('commentaires.destroy');
+    // Kanban par projet
+    // Chef équipe : liste des projets où il est membre
+    Route::get('/suivi', [ChefEquipeController::class, 'suivi'])->name('suivi');
+
+    // Kanban d'un projet
+    Route::get('/kanban/{projet}', [ChefEquipeController::class, 'kanbanProjet'])->name('kanban');
+
+
+
 });
 
 //Routes Collaborateurs 
@@ -107,7 +131,7 @@ Route::middleware(['auth', 'isCollaborateur'])->group(function () {
     Route::put('/collaborateur/taches/{tache}/statut', [CollaborateurController::class, 'updateStatut'])
     ->name('collaborateur.taches.updateStatut');
 
-    // Vue Kanban des tâches pour collaborateur
+    // Vue Kanban des tâches pour collaborateur ( ses propres taches)
     Route::get('/collaborateur/projets/{projet}/taches/kanban', [CollaborateurController::class, 'projetTachesKanban'])
     ->name('collaborateur.projets.taches.kanban');
     // Route pour la mise à jour du statut via Kanban
@@ -116,15 +140,21 @@ Route::middleware(['auth', 'isCollaborateur'])->group(function () {
     // Page Suivi
         Route::get('/collaborateur/suivi', [CollaborateurController::class, 'suivi'])
         ->name('collaborateur.suivi');
-
     // Kanban d'un projet
     Route::get('/collaborateur/suivi/projet/{projet}', [CollaborateurController::class, 'kanbanProjet'])
         ->name('collaborateur.suivi.kanban');
         // Gérer profil du collaborateur
-    
-        Route::get('/collaborateur/profil', [CollaborateurController::class, 'edit'])->name('collaborateur.profil');
+    Route::prefix('collaborateur/taches/{tache}')->group(function() {
+    Route::get('/commentaires', [TacheCommentaireController::class, 'index'])->name('collaborateur.taches.commentaires.index');
+    Route::post('/commentaires', [TacheCommentaireController::class, 'store'])->name('collaborateur.taches.commentaires.store');
+    Route::put('/{commentaire}', [TacheCommentaireController::class, 'update']);
+    Route::delete('/{commentaire}', [TacheCommentaireController::class, 'destroy']);
+
+    });
+
+    Route::get('/collaborateur/profil', [CollaborateurController::class, 'edit'])->name('collaborateur.profil');
     Route::put('/collaborateur/profil', [CollaborateurController::class, 'update']);
-});
+    });
 
    
 
