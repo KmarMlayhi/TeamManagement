@@ -270,5 +270,46 @@ class CollaborateurController extends Controller
         'priorites' => $priorites
     ]);
 }
+public function suivi()
+{
+    $userId = Auth::id();
 
+    $projets = Projet::whereHas('equipes.utilisateurs', function($q) use ($userId) {
+        $q->where('users.id', $userId);
+    })->get();
+
+    return view('collaborateur.suivi', compact('projets'));
 }
+
+public function kanbanProjet(Projet $projet)
+{
+    // Vérifier que l'utilisateur fait partie de ce projet via ses équipes
+    $userId = Auth::id();
+    $estMembre = $projet->equipes()->whereHas('utilisateurs', function($q) use ($userId) {
+        $q->where('users.id', $userId);
+    })->exists();
+
+    if (!$estMembre) {
+        abort(403, 'Accès non autorisé');
+    }
+
+    // Charger les tâches groupées par statut
+    $tachesCollection = Tache::where('projet_id', $projet->id)
+                            ->with('affecteA')
+                            ->get()
+                            ->groupBy('statut');
+
+    // Statuts et priorités à passer à la vue
+    $statuts = Tache::STATUTS;
+    $priorites = Tache::PRIORITES;
+
+    return view('collaborateur.kanban', [
+        'projet' => $projet,
+        'taches' => $tachesCollection,
+        'statuts' => $statuts,
+        'priorites' => $priorites,
+    ]);
+}
+}
+
+

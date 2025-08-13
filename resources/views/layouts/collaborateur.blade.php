@@ -37,11 +37,12 @@
                     <i class="fas fa-users"></i> Mes équipes
                 </a>
             </li>
-            <li class="{{ Request::is('collaborateur/projets*') ? 'active' : '' }}">
-                <a href="{{ route('collaborateur.projets.index') }}">
-                    <i class="fas fa-project-diagram"></i> Mes taches
-                </a>
-            </li>
+           <li>
+    <a href="{{ route('collaborateur.suivi') }}">
+        <i class="fas fa-project-diagram"></i> Suivi
+    </a>
+</li>
+
         </ul>
     </div>
 
