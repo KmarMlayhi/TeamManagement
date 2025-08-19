@@ -5,32 +5,33 @@ use App\Http\Controllers\Controller;
 use App\Models\Projet;
 use App\Models\Tache;
 use App\Models\User;
+use App\Models\Taskdocument; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class TacheController extends Controller
 {
-public function index(Projet $projet)
-{
-    $taches = $projet->taches()
-        ->with('affecteA.fonction', 'affecteA.role');  // charger fonction et role
+    public function index(Projet $projet)
+    {
+        // Charger les tâches avec les relations nécessaires
+        $taches = $projet->taches()
+            ->with(['users.fonction', 'users.role', 'taskdocuments']) // relations chargées
+            ->when(Schema::hasColumn('taches', 'ordre'), function($query) {
+                $query->orderBy('ordre');
+            }, function($query) {
+                $query->orderBy('created_at', 'desc');
+            })
+            ->get();
 
-    if (Schema::hasColumn('taches', 'ordre')) {
-        $taches->orderBy('ordre');
-    } else {
-        $taches->orderBy('created_at', 'desc');
+        return view('chef_equipe.projets.taches.index', [
+            'projet' => $projet,
+            'taches' => $taches,
+            'priorites' => \App\Models\Tache::PRIORITES,
+            'statuts' => \App\Models\Tache::STATUTS
+        ]);
     }
-
-    $taches = $taches->get();
-
-    return view('chef_equipe.projets.taches.index', [
-        'projet' => $projet,
-        'taches' => $taches,
-        'priorites' => \App\Models\Tache::PRIORITES,
-        'statuts' => \App\Models\Tache::STATUTS
-    ]);
-}
 
 
     public function create(Projet $projet)
@@ -40,12 +41,16 @@ public function index(Projet $projet)
             ->get()
             ->flatMap->utilisateurs
             ->unique('id');
-        return view('chef_equipe.projets.taches.create',
-        ['projet' => $projet,
-        'users' => $users,
-        'priorites' => Tache::PRIORITES, 
-        'statuts' => Tache::STATUTS,]);
+
+        return view('chef_equipe.projets.taches.create', [
+            'projet' => $projet,
+            'users' => $users,
+            'priorites' => Tache::PRIORITES,
+            'statuts' => Tache::STATUTS,
+            'tache' => null, // ✅ ajoute ceci pour éviter l'erreur
+        ]);
     }
+
 
     public function store(Request $request, Projet $projet)
     {
@@ -55,7 +60,9 @@ public function index(Projet $projet)
             'date_debut' => 'required|date',
             'date_fin_prevue' => 'required|date|after_or_equal:date_debut',
             'priorite' => 'required|in:basse,moyenne,haute',
-            'affecte_a' => 'required|exists:users,id',
+            'users' => 'required|array',
+            'users.*' => 'exists:users,id',
+            'documents.*' => 'file|mimes:pdf,doc,docx,xlsx,png,jpg,jpeg|max:2048'
         ]);
 
         $tache = new Tache($validated);
@@ -65,24 +72,41 @@ public function index(Projet $projet)
         $tache->ordre = $projet->taches()->max('ordre') + 1;
         $tache->save();
 
+        // ✅ plusieurs utilisateurs
+        $tache->users()->sync($validated['users']);
+
+        // ✅ upload documents avec Taskdocument
+        if ($request->hasFile('taskdocuments')) {
+            foreach ($request->file('taskdocuments') as $file) {
+                $path = $file->store('documents/taches/' . $tache->id, 'public');
+                Taskdocument::create([
+                    'tache_id' => $tache->id,
+                    'nom_original' => $file->getClientOriginalName(),
+                    'chemin' => $path,
+                ]);
+            }
+        }
+
+
         return redirect()->route('chef_equipe.projets.taches.index', $projet)
             ->with('success', 'Tâche créée avec succès.');
     }
 
     public function edit(Projet $projet, Tache $tache)
     {
-            $users = $projet->equipes()
+        $users = $projet->equipes()
             ->with('utilisateurs.fonction', 'utilisateurs.role')
             ->get()
             ->flatMap->utilisateurs
             ->unique('id');
+
         return view('chef_equipe.projets.taches.edit', [
-        'projet' => $projet,
-        'tache' => $tache,
-        'users' => $users,
-        'priorites' => \App\Models\Tache::PRIORITES,
-        'statuts' => \App\Models\Tache::STATUTS
-    ]);
+            'projet' => $projet,
+            'tache' => $tache->load('users', 'taskdocuments'),
+            'users' => $users,
+            'priorites' => Tache::PRIORITES,
+            'statuts' => Tache::STATUTS,
+        ]);
     }
 
     public function update(Request $request, Projet $projet, Tache $tache)
@@ -94,10 +118,27 @@ public function index(Projet $projet)
             'date_fin_prevue' => 'required|date|after_or_equal:date_debut',
             'priorite' => 'required|in:basse,moyenne,haute',
             'statut' => 'required|in:a_faire,en_cours,termine',
-            'affecte_a' => 'required|exists:users,id',
+            'users' => 'required|array',
+            'users.*' => 'exists:users,id',
+            'new_documents.*' => 'file|mimes:pdf,doc,docx,xls,xlsx,png,jpg,jpeg|max:10240',
         ]);
 
         $tache->update($validated);
+
+        // ✅ update users
+        $tache->users()->sync($validated['users']);
+
+        // ✅ upload docs
+        if ($request->hasFile('new_documents')) {
+            foreach ($request->file('new_documents') as $file) {
+                $path = $file->store('documents/taches/' . $tache->id, 'public');
+                Taskdocument::create([
+                    'tache_id' => $tache->id,
+                    'nom_original' => $file->getClientOriginalName(),
+                    'chemin' => $path,
+                ]);
+            }
+        }
 
         return redirect()->route('chef_equipe.projets.taches.index', $projet)
             ->with('success', 'Tâche mise à jour avec succès.');
@@ -105,10 +146,37 @@ public function index(Projet $projet)
 
     public function destroy(Projet $projet, Tache $tache)
     {
+        // ✅ supprimer les documents physiques
+        foreach ($tache->taskdocuments as $doc) {
+            Storage::disk('public')->delete($doc->chemin);
+            $doc->delete();
+        }
+
         $tache->delete();
+
         return redirect()->route('chef_equipe.projets.taches.index', $projet)
             ->with('success', 'Tâche supprimée avec succès.');
     }
+    public function destroyDocument(Taskdocument $taskdocument)
+{
+    $tache = $taskdocument->tache;
+
+    // Vérifier que l'utilisateur a le droit de supprimer
+    if ($tache->projet->created_by !== auth()->id()) {
+        abort(403);
+    }
+
+    // Supprimer le fichier physique
+    if (Storage::disk('public')->exists($taskdocument->chemin)) {
+        Storage::disk('public')->delete($taskdocument->chemin);
+    }
+
+    // Supprimer la ligne en base
+    $taskdocument->delete();
+
+    return response()->json(['success' => true]);
+}
+
 
     public function reorder(Request $request, Projet $projet)
     {

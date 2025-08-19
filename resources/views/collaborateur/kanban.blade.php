@@ -288,14 +288,14 @@
                                             'en_cours' => 'primary', 
                                             'termine' => 'success'
                                         ][$statusKey] }} ms-2">
-                                            {{ count($taches[$statusKey] ?? []) }}
+                                            {{ count($tachesCollection[$statusKey] ?? []) }}
                                         </span>
                                     </h5>
                                 </div>
                             </div>
                             <div class="kanban-cards">
-                                @if(isset($taches[$statusKey]) && count($taches[$statusKey]) > 0)
-                                    @foreach($taches[$statusKey] as $tache)
+                                @if(isset($tachesCollection[$statusKey]) && count($tachesCollection[$statusKey]) > 0)
+                                    @foreach($tachesCollection[$statusKey] as $tache)
                                         <div class="kanban-task">
                                             <div class="task-title">
                                                 {{ $tache->titre }}
@@ -318,19 +318,24 @@
                                                 </span>
                                             </div>
                                             
-                                            <div class="assignee-info">
-                                                @if($tache->affecteA)
-                                                    <div class="rounded-circle me-1 d-flex align-items-center justify-content-center" 
-                                                        style="width: 24px; height: 24px; background-color: #e2e8f0; font-size: 0.75rem; font-weight: bold;"
-                                                        title="{{ $tache->affecteA->name }}">
-                                                        {{ strtoupper(substr($tache->affecteA->name, 0, 1) . substr(strrchr($tache->affecteA->name, ' '), 1, 1)) }}
-                                                    </div>
+                                            <div class="assignee-info d-flex align-items-center">
+                                                @if($tache->users->count() > 0)
+                                                    @foreach($tache->users as $user)
+                                                        <div class="rounded-circle me-1 d-flex align-items-center justify-content-center" 
+                                                            style="width: 24px; height: 24px; background-color: #e2e8f0; font-size: 0.75rem; font-weight: bold;"
+                                                            title="{{ $user->name }}">
+                                                            {{ strtoupper(substr($user->name, 0, 1) . (str_contains($user->name, ' ') ? substr(strrchr($user->name, ' '), 1, 1) : '')) }}
+                                                        </div>
+                                                    @endforeach
+                                                @else
+                                                    <div class="text-muted">Non assigné</div>
                                                 @endif
 
-
-                                                <div class="assignee-details">
-                                                    <div class="name">{{ $tache->affecteA->name ?? 'Non assigné' }}</div>
-                                                    <div class="email">{{ $tache->affecteA->email ?? '' }}</div>
+                                                <div class="assignee-details ms-2">
+                                                    @foreach($tache->users as $user)
+                                                        <div class="name">{{ $user->name }}</div>
+                                                        <div class="email">{{ $user->email }}</div>
+                                                    @endforeach
                                                 </div>
                                             </div>
                                         </div>

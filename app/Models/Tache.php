@@ -10,7 +10,7 @@ class Tache extends Model
 
       protected $fillable = [
         'titre', 'description', 'date_debut', 'date_fin_prevue', 
-        'priorite', 'statut', 'projet_id', 'affecte_a', 'ordre' , 'created_by'
+        'priorite', 'statut', 'projet_id', 'ordre' , 'created_by'
     ];
 
     protected $casts = [
@@ -38,10 +38,20 @@ class Tache extends Model
         return $this->belongsTo(Projet::class);
     }
 
-    public function affecteA()
+     // Relation many-to-many avec User
+    
+    public function users()
     {
-        return $this->belongsTo(User::class, 'affecte_a');
+        return $this->belongsToMany(User::class, 'tache_user')->withTimestamps();
     }
+
+
+    // Relation avec les documents
+    public function taskdocuments()
+    {
+        return $this->hasMany(Taskdocument::class);
+    }
+
     public function createur()
     {
         return $this->belongsTo(User::class, 'created_by');

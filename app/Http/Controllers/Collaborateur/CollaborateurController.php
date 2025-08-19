@@ -16,26 +16,18 @@ class CollaborateurController extends Controller
         return view('collaborateur.home');
     }
 
-    // Liste des équipes du collaborateur
     public function equipesIndex()
     {
-        // Récupère l'utilisateur connecté avec ses équipes
         $user = Auth::user()->load('equipes');
-
-        return view('collaborateur.equipes.index', [
-            'equipes' => $user->equipes
-        ]);
+        return view('collaborateur.equipes.index', ['equipes' => $user->equipes]);
     }
 
-    // Détails d'une équipe spécifique
     public function equipesShow(Equipe $equipe)
     {
-        // Vérifie que l'utilisateur appartient à l'équipe
         if (!Auth::user()->equipes->contains($equipe)) {
             abort(403, "Vous n'avez pas accès à cette équipe");
         }
 
-        // Charge les relations nécessaires, y compris fonction et rôle des utilisateurs
         $equipe->load([
             'utilisateurs.fonction',
             'utilisateurs.role',
@@ -47,10 +39,8 @@ class CollaborateurController extends Controller
         return view('collaborateur.equipes.show', compact('equipe'));
     }
 
-    // Détails d'un projet spécifique
     public function projetDetails(Projet $projet)
     {
-        // Vérifie que l'utilisateur a accès à ce projet
         $user = Auth::user();
         $userEquipesIds = $user->equipes->pluck('id')->toArray();
         $projetEquipesIds = $projet->equipes->pluck('id')->toArray();
@@ -59,7 +49,6 @@ class CollaborateurController extends Controller
             abort(403, "Vous n'avez pas accès à ce projet");
         }
 
-        // Charge les relations nécessaires
         $projet->load([
             'equipes.utilisateurs.fonction',
             'equipes.utilisateurs.role',
@@ -67,12 +56,10 @@ class CollaborateurController extends Controller
             'createdBy'
         ]);
 
-        // Formater les dates
         $date_debut_formatted = $projet->date_debut->format('d/m/Y');
         $date_fin_prevue_formatted = $projet->date_fin_prevue->format('d/m/Y');
         $date_fin_reelle_formatted = $projet->date_fin_reelle ? $projet->date_fin_reelle->format('d/m/Y') : null;
 
-        // Formater les documents
         $documents = $projet->documents->map(function ($document) {
             return [
                 'id' => $document->id,
@@ -83,7 +70,6 @@ class CollaborateurController extends Controller
             ];
         });
 
-        // Formater les équipes impliquées
         $equipes = $projet->equipes->map(function ($equipe) {
             return [
                 'id' => $equipe->id,
@@ -119,197 +105,162 @@ class CollaborateurController extends Controller
         ]);
     }
 
-    // Helper pour formater la taille des fichiers
     private function formatFileSize($bytes)
     {
-        if ($bytes >= 1073741824) {
-            return number_format($bytes / 1073741824, 2) . ' GB';
-        } elseif ($bytes >= 1048576) {
-            return number_format($bytes / 1048576, 2) . ' MB';
-        } elseif ($bytes >= 1024) {
-            return number_format($bytes / 1024, 2) . ' KB';
-        } elseif ($bytes > 1) {
-            return $bytes . ' bytes';
-        } elseif ($bytes == 1) {
-            return '1 byte';
-        } else {
-            return '0 bytes';
-        }
-    
+        if ($bytes >= 1073741824) return number_format($bytes / 1073741824, 2) . ' GB';
+        if ($bytes >= 1048576) return number_format($bytes / 1048576, 2) . ' MB';
+        if ($bytes >= 1024) return number_format($bytes / 1024, 2) . ' KB';
+        if ($bytes > 1) return $bytes . ' bytes';
+        if ($bytes == 1) return '1 byte';
+        return '0 bytes';
     }
 
+    // Liste des tâches pour un projet et une équipe
     public function projetTaches(Projet $projet)
     {
         $user = Auth::user();
         $equipeId = request('equipe_id');
 
-        // Trouver l'équipe spécifique que l'utilisateur a sélectionnée
         $equipe = $projet->equipes()
             ->whereIn('id', $user->equipes->pluck('id'))
             ->where('id', $equipeId)
             ->first();
 
-        if (!$equipe) {
-            abort(403, "Vous n'avez pas accès à cette équipe");
-        }
+        if (!$equipe) abort(403, "Vous n'avez pas accès à cette équipe");
 
-        // Récupérer les tâches POUR CETTE ÉQUIPE SPÉCIFIQUE via la relation utilisateur
         $taches = Tache::where('projet_id', $projet->id)
-            ->where('affecte_a', $user->id)
-            ->whereHas('affecteA', function ($query) use ($equipeId) {
-                $query->whereHas('equipes', function ($q) use ($equipeId) {
-                    $q->where('equipes.id', $equipeId);
-                });
+            ->where(function($query) use ($user) {
+                $query->whereHas('users', fn($q) => $q->where('users.id', $user->id))
+                      ->orWhere('created_by', $user->id);
             })
-            ->with(['projet', 'affecteA'])
+            ->with(['projet', 'users'])
             ->orderBy('date_fin_prevue', 'asc')
             ->get();
 
         return view('collaborateur.taches.index', compact('taches', 'projet', 'equipe'));
-}
+    }
+
+    public function projetTachesKanban(Projet $projet)
+    {
+        $user = Auth::user();
+        $equipeId = request('equipe_id');
+
+        $equipe = $projet->equipes()
+            ->whereIn('id', $user->equipes->pluck('id'))
+            ->where('id', $equipeId)
+            ->first();
+
+        if (!$equipe) abort(403, "Vous n'avez pas accès à cette équipe");
+
+        $taches = Tache::where('projet_id', $projet->id)
+            ->where(function($query) use ($user) {
+                $query->whereHas('users', fn($q) => $q->where('users.id', $user->id))
+                      ->orWhere('created_by', $user->id);
+            })
+            ->with(['projet', 'users'])
+            ->get();
+
+        $statuts = Tache::STATUTS;
+        $priorites = Tache::PRIORITES;
+
+        $tachesGrouped = [];
+        foreach ($statuts as $key => $label) {
+            $tachesGrouped[$key] = $taches->where('statut', $key)->all();
+        }
+
+        return view('collaborateur.taches.kanban', compact('projet', 'equipe', 'tachesGrouped', 'statuts', 'priorites'));
+    }
+
+    // Afficher une tâche
     public function showTache(Tache $tache)
     {
         $user = Auth::user();
-        
-        // Vérifier que l'utilisateur est bien assigné à cette tâche
-        if ($tache->affecte_a !== $user->id) {
+
+        if (!$tache->users->contains($user) && $tache->created_by !== $user->id) {
             abort(403, "Vous n'êtes pas assigné à cette tâche");
         }
 
-        // Trouver l'équipe associée à la tâche et au projet que l'utilisateur peut voir
         $equipe = $tache->projet->equipes()
             ->whereIn('id', $user->equipes->pluck('id'))
             ->first();
 
-        if (!$equipe) {
-            abort(403, "Vous n'avez pas accès à ce projet");
-        }
+        if (!$equipe) abort(403, "Vous n'avez pas accès à ce projet");
+
+        $tache->load('taskdocuments');
 
         return view('collaborateur.taches.show', compact('tache', 'equipe'));
     }
-// Mettre à jour le statut d'une tâche
+
+    // Mise à jour du statut
     public function updateStatut(Request $request, Tache $tache)
     {
-            // Vérifier que l'utilisateur est bien assigné à cette tâche
-            if ($tache->affecte_a !== Auth::id()) {
-                abort(403, "Vous n'êtes pas assigné à cette tâche");
-            }
+        $user = Auth::user();
+        if (!$tache->users->contains($user) && $tache->created_by !== $user->id) {
+            abort(403, "Vous n'êtes pas assigné à cette tâche");
+        }
 
-            $request->validate([
-                'statut' => 'required|in:a_faire,en_cours,termine'
-            ]);
+        $request->validate([
+            'statut' => 'required|in:a_faire,en_cours,termine'
+        ]);
 
-            $tache->update([
-                'statut' => $request->statut,
-                'date_fin_reelle' => $request->statut === 'termine' ? now() : null
-            ]);
+        $tache->update([
+            'statut' => $request->statut,
+            'date_fin_reelle' => $request->statut === 'termine' ? now() : null
+        ]);
 
-            return redirect()->back()->with('success', 'Statut de la tâche mis à jour avec succès');
+        return redirect()->back()->with('success', 'Statut de la tâche mis à jour avec succès');
     }
+
+    // Mise à jour du statut via Kanban
     public function updateStatutKanban(Request $request)
-{
-    $request->validate([
-        'tache_id' => 'required|exists:taches,id',
-        'statut' => 'required|in:a_faire,en_cours,termine'
-    ]);
-    
-    $tache = Tache::findOrFail($request->tache_id);
+    {
+        $request->validate([
+            'tache_id' => 'required|exists:taches,id',
+            'statut' => 'required|in:a_faire,en_cours,termine'
+        ]);
 
-    // Vérifier que l'utilisateur est bien assigné à cette tâche
-    if ($tache->affecte_a !== Auth::id()) {
-        return response()->json(['error' => 'Unauthorized'], 403);
+        $tache = Tache::findOrFail($request->tache_id);
+        $user = Auth::user();
+
+        if (!$tache->users->contains($user) && $tache->created_by !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $tache->update([
+            'statut' => $request->statut,
+            'date_fin_reelle' => $request->statut === 'termine' ? now() : null
+        ]);
+
+        return response()->json(['success' => true]);
     }
 
-    $tache->update([
-        'statut' => $request->statut,
-        'date_fin_reelle' => $request->statut === 'termine' ? now() : null
-    ]);
+    // Vue Kanban globale
+    public function kanbanProjet(Projet $projet)
+    {
+        $userId = Auth::id();
+        $estMembre = $projet->equipes()->whereHas('utilisateurs', fn($q) => $q->where('users.id', $userId))->exists();
 
-    return response()->json(['success' => true]);
-}
-    public function projetTachesKanban(Projet $projet)
-{
-    $user = Auth::user();
-    $equipeId = request('equipe_id');
+        if (!$estMembre) abort(403, 'Accès non autorisé');
 
-    // Trouver l'équipe spécifique que l'utilisateur a sélectionnée
-    $equipe = $projet->equipes()
-        ->whereIn('id', $user->equipes->pluck('id'))
-        ->where('id', $equipeId)
-        ->first();
+        $tachesCollection = Tache::where('projet_id', $projet->id)
+            ->where(function($query) use ($userId) {
+                $query->whereHas('users', fn($q) => $q->where('users.id', $userId))
+                      ->orWhere('created_by', $userId);
+            })
+            ->with('users')
+            ->get()
+            ->groupBy('statut');
 
-    if (!$equipe) {
-        abort(403, "Vous n'avez pas accès à cette équipe");
+        $statuts = Tache::STATUTS;
+        $priorites = Tache::PRIORITES;
+
+        return view('collaborateur.kanban', compact('projet', 'tachesCollection', 'statuts', 'priorites'));
     }
 
-    // Récupérer les tâches POUR CETTE ÉQUIPE SPÉCIFIQUE via la relation utilisateur
-    $taches = Tache::where('projet_id', $projet->id)
-        ->where('affecte_a', $user->id)
-        ->whereHas('affecteA', function ($query) use ($equipeId) {
-            $query->whereHas('equipes', function ($q) use ($equipeId) {
-                $q->where('equipes.id', $equipeId);
-            });
-        })
-        ->with(['projet', 'affecteA'])
-        ->get();
-
-    // Organiser les tâches par statut
-    $statuts = Tache::STATUTS;
-    $priorites = Tache::PRIORITES;
-    
-    $tachesGrouped = [];
-    foreach ($statuts as $key => $label) {
-        $tachesGrouped[$key] = $taches->where('statut', $key)->all();
+    public function suivi()
+    {
+        $userId = Auth::id();
+        $projets = Projet::whereHas('equipes.utilisateurs', fn($q) => $q->where('users.id', $userId))->get();
+        return view('collaborateur.suivi', compact('projets'));
     }
-
-    return view('collaborateur.taches.kanban', [
-        'projet' => $projet,
-        'equipe' => $equipe,
-        'taches' => $tachesGrouped,
-        'statuts' => $statuts,
-        'priorites' => $priorites
-    ]);
 }
-public function suivi()
-{
-    $userId = Auth::id();
-
-    $projets = Projet::whereHas('equipes.utilisateurs', function($q) use ($userId) {
-        $q->where('users.id', $userId);
-    })->get();
-
-    return view('collaborateur.suivi', compact('projets'));
-}
-
-public function kanbanProjet(Projet $projet)
-{
-    // Vérifier que l'utilisateur fait partie de ce projet via ses équipes
-    $userId = Auth::id();
-    $estMembre = $projet->equipes()->whereHas('utilisateurs', function($q) use ($userId) {
-        $q->where('users.id', $userId);
-    })->exists();
-
-    if (!$estMembre) {
-        abort(403, 'Accès non autorisé');
-    }
-
-    // Charger les tâches groupées par statut
-    $tachesCollection = Tache::where('projet_id', $projet->id)
-                            ->with('affecteA')
-                            ->get()
-                            ->groupBy('statut');
-
-    // Statuts et priorités à passer à la vue
-    $statuts = Tache::STATUTS;
-    $priorites = Tache::PRIORITES;
-
-    return view('collaborateur.kanban', [
-        'projet' => $projet,
-        'taches' => $tachesCollection,
-        'statuts' => $statuts,
-        'priorites' => $priorites,
-    ]);
-}
-}
-
-

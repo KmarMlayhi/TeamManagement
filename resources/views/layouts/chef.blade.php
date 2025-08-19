@@ -46,9 +46,12 @@
             <li>
                 <a href="{{ route('chef_equipe.suivi') }}"><i class="fas fa-chart-line"></i> Suivi des projets</a>
             </li>
-            <li>
-                <a href="#"><i class="fas fa-comment-alt"></i> Discussion génèrale </a>
+           <li>
+                <a href="{{ route('chef_equipe.project_messages.projet_list') }}">
+                    <i class="fas fa-comment-alt"></i> Discussions projets
+                </a>
             </li>
+
         </ul>
     </div>
 

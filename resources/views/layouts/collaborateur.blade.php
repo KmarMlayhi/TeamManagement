@@ -38,10 +38,16 @@
                 </a>
             </li>
            <li>
-    <a href="{{ route('collaborateur.suivi') }}">
-        <i class="fas fa-project-diagram"></i> Suivi
-    </a>
-</li>
+                <a href="{{ route('collaborateur.suivi') }}">
+                    <i class="fas fa-project-diagram"></i> Suivi
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('projet_messages.projet_list') }}">
+                    <i class="fas fa-comment-alt"></i> Discussions projets
+                </a>
+            </li>
+
 
         </ul>
     </div>

@@ -73,7 +73,7 @@
                                     'en_cours' => 'primary', 
                                     'termine' => 'success'
                                 ][$statusKey] }} ms-2">
-                                    {{ count($taches[$statusKey] ?? []) }}
+                                    {{ count($tachesGrouped[$statusKey] ?? []) }}
                                 </span>
                             </h5>
                             @if($statusKey === 'a_faire')
@@ -87,7 +87,7 @@
                     </div>
 
                     <div class="card-body kanban-column p-2" data-status="{{ $statusKey }}">
-                        @foreach($taches[$statusKey] ?? [] as $tache)
+                        @foreach($tachesGrouped[$statusKey] ?? [] as $tache)
                         <div class="card mb-3 kanban-task" data-id="{{ $tache->id }}">
                             <div class="card-body p-3">
                                 <h6 class="mb-2">
@@ -114,11 +114,17 @@
                                         {{ $tache->date_fin_prevue->format('d/m/Y') }}
                                     </span>
                                 </div>
+                                <div class="mt-2">
+                                    <i class="fas fa-user-friends me-1"></i>
+                                    @foreach($tache->users as $user)
+                                        <span class="badge bg-light text-dark">{{ $user->name }}</span>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                         @endforeach
 
-                        @if(empty($taches[$statusKey]))
+                        @if(empty($tachesGrouped[$statusKey]))
                           <div class="empty-state">
                           <i class="fas fa-clipboard-list fa-2x mb-2"></i>
                           <p>Aucune tâche dans cette colonne</p>

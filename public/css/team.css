@@ -14,6 +14,7 @@
     --border-color: #dee2e6;
     --text-color: #212529;
     --text-muted: #6c757d;
+    
 }
 
 
@@ -454,6 +455,9 @@
   border-radius: 0.25rem;
 }
 
+.bg-projet{
+     color: var(--secondary-color);
+}
 .bg-primary {
   background-color: var(--primary-color) !important;
 }

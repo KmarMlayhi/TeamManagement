@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Collaborateur;
 
 use App\Http\Controllers\Controller;
@@ -14,7 +13,9 @@ class TacheCommentaireController extends Controller
     public function index(Tache $tache)
     {
         $user = Auth::user();
-        if ($user->id !== $tache->created_by && $user->id !== $tache->affecte_a) {
+
+        // ✅ Vérification des permissions : créateur ou utilisateur assigné
+        if ($user->id !== $tache->created_by && !$tache->users->contains($user)) {
             return response()->json(['error' => 'Non autorisé'], 403);
         }
 
@@ -26,10 +27,11 @@ class TacheCommentaireController extends Controller
         return response()->json([
             'success' => true,
             'commentaires' => $commentaires,
-            'canEdit' => $user->id === $tache->created_by // Ajouté pour gérer les permissions
+            'canEdit' => $user->id === $tache->created_by
         ]);
     }
 
+    // Créer un commentaire
     public function store(Request $request, Tache $tache)
     {
         $request->validate([
@@ -37,6 +39,11 @@ class TacheCommentaireController extends Controller
         ]);
 
         $user = Auth::user();
+
+        // ✅ Vérification des permissions : créateur ou utilisateur assigné
+        if ($user->id !== $tache->created_by && !$tache->users->contains($user)) {
+            return response()->json(['error' => 'Non autorisé'], 403);
+        }
 
         $commentaire = $tache->commentaires()->create([
             'projet_id' => $tache->projet_id,
@@ -48,48 +55,51 @@ class TacheCommentaireController extends Controller
         return $commentaire->load(['auteur:id,name', 'destinataire:id,name']);
     }
 
-   public function update(Request $request, $tacheId, $commentaireId)
-{
-    $user = Auth::user();
+    // Mettre à jour un commentaire
+    public function update(Request $request, $tacheId, $commentaireId)
+    {
+        $user = Auth::user();
 
-    $commentaire = Commentaire::where('id', $commentaireId)
-        ->where('tache_id', $tacheId)
-        ->firstOrFail();
+        $commentaire = Commentaire::where('id', $commentaireId)
+            ->where('tache_id', $tacheId)
+            ->firstOrFail();
 
-    if ($user->id !== $commentaire->auteur_id) {
-        return response()->json(['error' => 'Non autorisé'], 403);
+        // ✅ Vérification : seul l'auteur du commentaire peut le modifier
+        if ($user->id !== $commentaire->auteur_id) {
+            return response()->json(['error' => 'Non autorisé'], 403);
+        }
+
+        $request->validate([
+            'contenu' => 'required|string|max:1000',
+        ]);
+
+        $commentaire->update([
+            'contenu' => $request->contenu,
+            'edited_at' => now()
+        ]);
+
+        return $commentaire->load(['auteur:id,name', 'destinataire:id,name']);
     }
 
-    $request->validate([
-        'contenu' => 'required|string|max:1000',
-    ]);
+    // Supprimer un commentaire
+    public function destroy($tacheId, $commentaireId)
+    {
+        $user = Auth::user();
 
-    $commentaire->update([
-        'contenu' => $request->contenu,
-        'edited_at' => now()
-    ]);
+        $commentaire = Commentaire::where('id', $commentaireId)
+            ->where('tache_id', $tacheId)
+            ->firstOrFail();
 
-    return $commentaire->load(['auteur:id,name', 'destinataire:id,name']);
-}
+        // ✅ Vérification : auteur du commentaire ou créateur de la tâche
+        if ($user->id !== $commentaire->auteur_id && !$commentaire->tache->users->contains($user) && $user->id !== $commentaire->tache->created_by) {
+            return response()->json(['error' => 'Non autorisé'], 403);
+        }
 
-public function destroy($tacheId, $commentaireId)
-{
-    $user = Auth::user();
+        $commentaire->delete();
 
-    $commentaire = Commentaire::where('id', $commentaireId)
-        ->where('tache_id', $tacheId)
-        ->firstOrFail();
-
-    if ($user->id !== $commentaire->auteur_id && $user->id !== $commentaire->tache->created_by) {
-        return response()->json(['error' => 'Non autorisé'], 403);
+        return response()->json([
+            'success' => true,
+            'message' => 'Commentaire supprimé'
+        ]);
     }
-
-    $commentaire->delete();
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Commentaire supprimé'
-    ]);
-}
-
 }

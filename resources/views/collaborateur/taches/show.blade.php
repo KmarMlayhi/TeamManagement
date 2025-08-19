@@ -294,6 +294,21 @@
                         <h5 class="mb-3"><i class="fas fa-align-left me-2"></i>Description</h5>
                         <div class="description-content">
                             {{ $tache->description ?: "Aucune description fournie" }}
+                        </div> <br>
+                        <div>
+                        @if($tache->taskdocuments->isNotEmpty())
+                        <h5 class="mb-3"><i class="fa fa-folder-open"></i> Documents partagés </h5>
+                            <ul class="list-group">
+                                @foreach($tache->taskdocuments as $doc)
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <a href="{{ asset('storage/' . $doc->chemin) }}" target="_blank">
+                                            <i class="fas fa-file-alt me-2"></i>{{ $doc->nom_original}}
+                                        </a>
+                                        <span class="badge bg-secondary">{{ $doc->type }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
                         </div>
                     </div>
                 </div>
@@ -346,8 +361,7 @@
                         <li class="list-group-item">
                             <div class="info-label">Changer le statut</div>
                             <div class="info-value">
-                                <form method="POST" action="{{ route('collaborateur.taches.updateStatut', $tache) }}" 
-                                    class="status-form" id="statusForm">
+                                <form method="POST" action="{{ route('collaborateur.taches.updateStatut', $tache) }}" class="status-form" id="statusForm">
                                     @csrf
                                     @method('PUT')
                                     <input type="hidden" name="statut" id="selectedStatus" value="{{ $tache->statut }}">
@@ -405,12 +419,12 @@
             <ul class="nav nav-tabs" id="tacheTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="soumission-tab" data-bs-toggle="tab" data-bs-target="#soumission" type="button" role="tab">
-                        <i class="fas fa-file-upload me-2"></i>Soumission du travail
+                        <i class="fas fa-file-upload me-2"></i>Partage Documents
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="commentaires-tab" data-bs-toggle="tab" data-bs-target="#commentaires" type="button" role="tab">
-                        <i class="fas fa-comments me-2"></i>Commentaires
+                        <i class="fas fa-comments me-2"></i>Commentaires partagés
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -421,19 +435,19 @@
             </ul>
         </div>
         <div class="card-body">
-    <div class="tab-content" id="tacheTabsContent">
+        <div class="tab-content" id="tacheTabsContent">
         <div class="tab-pane fade show active" id="commentaires" role="tabpanel">
             <div class="feature-coming">
                 <div id="commentaires-container">
                     <div id="liste-commentaires"></div>
                 </div>
 
-                    @if(Auth::id() === $tache->created_by || Auth::id() === $tache->affecte_a)
-                    <form id="form-commentaire">
-                        @csrf
-                        <textarea name="contenu" class="form-control mb-2" placeholder="Écrire un commentaire..." required></textarea>
-                        <button type="submit" class="btn btn-primary btn-sm">Envoyer</button>
-                    </form>
+                    @if(Auth::id() === $tache->created_by || $tache->users->contains(Auth::user()))
+                        <form id="form-commentaire">
+                            @csrf
+                            <textarea name="contenu" class="form-control mb-2" placeholder="Écrire un commentaire..." required></textarea>
+                            <button type="submit" class="btn btn-primary btn-sm">Envoyer</button>
+                        </form>
                     @endif
                 </div>
             </div>
@@ -671,6 +685,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     loadCommentaires();
+});
+document.querySelectorAll('.status-selector').forEach(selector => {
+    const hiddenInput = selector.closest('form').querySelector('#selectedStatus');
+
+    selector.querySelectorAll('.status-option').forEach(option => {
+        option.addEventListener('click', function() {
+            // Retirer "active" des autres
+            selector.querySelectorAll('.status-option').forEach(o => o.classList.remove('active'));
+            // Ajouter "active" à l'option cliquée
+            this.classList.add('active');
+            // Mettre à jour l'input caché
+            hiddenInput.value = this.dataset.value;
+        });
+    });
 });
 
 </script>

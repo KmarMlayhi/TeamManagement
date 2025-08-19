@@ -89,4 +89,48 @@ class ChefEquipeCommentaireController extends Controller
 
         return response()->json(['success' => true]);
     }
+    // Dans ChefEquipeCommentaireController
+
+// 1️⃣ Méthode pour récupérer le commentaire à éditer
+public function edit(Commentaire $commentaire)
+{
+    $chef = Auth::user();
+
+    if ($chef->role->name !== 'chef_equipe' || $chef->id !== $commentaire->auteur_id) {
+        abort(403, 'Non autorisé');
+    }
+
+    // Retourne le commentaire pour affichage dans un formulaire ou modal
+    return response()->json([
+        'id' => $commentaire->id,
+        'contenu' => $commentaire->contenu,
+    ]);
+}
+
+// 2️⃣ Méthode pour mettre à jour le commentaire
+public function update(Request $request, Commentaire $commentaire)
+{
+    $chef = Auth::user();
+
+    if ($chef->role->name !== 'chef_equipe' || $chef->id !== $commentaire->auteur_id) {
+        return response()->json(['error' => 'Non autorisé'], 403);
+    }
+
+    $request->validate([
+        'contenu' => 'required|string|max:1000',
+    ]);
+
+    $commentaire->contenu = $request->contenu;
+    $commentaire->save();
+
+    return response()->json([
+        'success' => true,
+        'commentaire' => [
+            'id' => $commentaire->id,
+            'contenu' => $commentaire->contenu,
+            'updated_at_humans' => $commentaire->updated_at->diffForHumans(),
+        ]
+    ]);
+}
+
 }

@@ -28,75 +28,6 @@
         </div>
     @endif
 
-    <!-- Stats Cards -->
-    <div class="row mb-4 stats-row">
-        <div class="col-md-3 mb-3">
-            <div class="card stats-card pending">
-                <div class="card-body py-2">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-user-clock card-icon"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="card-title mb-1">En attente</h5=6>
-                            <h4 class="mb-0">{{ $pendingCollaborateurs + $pendingChefs }}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3 mb-3">
-            <div class="card stats-card collaborators">
-                <div class="card-body py-2">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-users card-icon"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="card-title mb-1">Collaborateurs</h6>
-                            <h4 class="mb-0">{{ $totalCollaborateurs }}</h4>
-                            <small class="stats-subtext">{{ $totalCollaborateurs - $pendingCollaborateurs }} validés</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3 mb-3">
-            <div class="card stats-card chefs">
-                <div class="card-body py-2">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-user-tie card-icon"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="card-title mb-1">Chefs d'Équipe</h6>
-                            <h4 class="mb-0">{{ $totalChefs }}</h4>
-                            <small class="stats-subtext">{{ $totalChefs - $pendingChefs }} validés</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3 mb-3">
-            <div class="card stats-card validated">
-                <div class="card-body py-2">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-user-check card-icon"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="card-title mb-1">Total Validés</h6>
-                            <h4 class="mb-0">{{ ($totalCollaborateurs - $pendingCollaborateurs) + ($totalChefs - $pendingChefs) }}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Users Table -->
     <div class="card dashboard-card">
         <div class="card-body">
@@ -157,7 +88,12 @@
                                     </td>
                                     <td>{{ $user->grade ? $user->grade->nom : 'Aucun grade' }}</td>
                                     <td>{{ $user->name }}</td>
-                                    <td>{{ $user->email }}</td>
+                                    <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" 
+                                        title="{{ $user->email }}" 
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top">
+                                        {{ $user->email }}
+                                    </td>
                                     <td>{{ $user->direction ? $user->direction->nom : 'Aucune direction' }}</td>
                                     <td>
                                         @php $roleName = $user->role?->name ?? 'inconnu'; @endphp

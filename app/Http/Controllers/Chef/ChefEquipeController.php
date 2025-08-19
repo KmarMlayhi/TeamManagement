@@ -84,7 +84,7 @@ class ChefEquipeController extends Controller
 
         // Charger les tâches par statut
         $tachesCollection = Tache::where('projet_id', $projet->id)
-            ->with('affecteA')
+            ->with('users')
             ->get()
             ->groupBy('statut');
 

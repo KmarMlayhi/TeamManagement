@@ -258,7 +258,7 @@
     <div class="kanban-header mb-4">
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="mb-0">
-                <i class="fas fa-columns me-2"></i>Tableau Kanban : {{ $projet->nom }}
+                <i class="fas fa-columns me-2"></i>Tableau Kanban  {{ $projet->nom }}
             </h2>
         </div>
     </div>
@@ -317,22 +317,27 @@
                                                     @endif
                                                 </span>
                                             </div>
-                                            
-                                            <div class="assignee-info">
-                                                @if($tache->affecteA)
-                                                    <div class="rounded-circle me-1 d-flex align-items-center justify-content-center" 
-                                                        style="width: 24px; height: 24px; background-color: #e2e8f0; font-size: 0.75rem; font-weight: bold;"
-                                                        title="{{ $tache->affecteA->name }}">
-                                                        {{ strtoupper(substr($tache->affecteA->name, 0, 1) . substr(strrchr($tache->affecteA->name, ' '), 1, 1)) }}
+                                            <div class="assignee-info d-flex align-items-center">
+                                                @if($tache->users->count() > 0)
+                                                    @foreach($tache->users as $user)
+                                                        <div class="rounded-circle me-1 d-flex align-items-center justify-content-center" 
+                                                            style="width: 24px; height: 24px; background-color: #e2e8f0; font-size: 0.75rem; font-weight: bold;"
+                                                            title="{{ $user->name }}">
+                                                            {{ strtoupper(substr($user->name, 0, 1) . (str_contains($user->name, ' ') ? substr(strrchr($user->name, ' '), 1, 1) : '')) }}
+                                                        </div>
+                                                    @endforeach
+
+                                                    <div class="assignee-details ms-2">
+                                                        @foreach($tache->users as $user)
+                                                            <div class="name">{{ $user->name }}</div>
+                                                            <div class="email">{{ $user->email }}</div>
+                                                        @endforeach
                                                     </div>
+                                                @else
+                                                    <div class="text-muted">Non assigné</div>
                                                 @endif
-
-
-                                                <div class="assignee-details">
-                                                    <div class="name">{{ $tache->affecteA->name ?? 'Non assigné' }}</div>
-                                                    <div class="email">{{ $tache->affecteA->email ?? '' }}</div>
-                                                </div>
                                             </div>
+
                                         </div>
                                     @endforeach
                                 @else

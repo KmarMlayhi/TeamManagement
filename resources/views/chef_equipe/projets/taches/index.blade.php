@@ -52,13 +52,14 @@
                     <i class="fas fa-info-circle me-1"></i>Aucune tâche créée pour ce projet.
                 </div>
             @else
-                <div class="table-responsive">
-                    <table class="table table-hover table-taches">
+                <div class="table-responsive" style="overflow-x: auto;">
+                    <table class="table table-hover table-taches" style="min-width: 850px;">
                         <thead class="table-light">
                             <tr>
                                 <th width="50" class="text-center"><i class="fas fa-arrows-alt"></i></th>
                                 <th>Titre</th>
                                 <th>Assigné à</th>
+                                <th>Documents</th>
                                 <th>Dates</th>
                                 <th>Priorité</th>
                                 <th>Statut</th>
@@ -78,21 +79,40 @@
                                     @endif
                                 </td>
                                 <td>
-                                    @if($tache->affecteA)
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-sm me-2">
-                                                {{ substr($tache->affecteA->name, 0, 1) }}
-                                            </div>
-                                            <div>
-                                                <div class="fw-medium">{{ $tache->affecteA->name }}</div>
-                                                <small class="text-muted">{{ $tache->affecteA->fonction?->nom ?? 'Non spécifié' }}</small>
-                                            </div>
+                                    @if($tache->users->isNotEmpty())
+                                        <div class="d-flex flex-column">
+                                            @foreach($tache->users as $user)
+                                                <div class="d-flex align-items-center mb-1">
+                                                    <div class="avatar-sm me-2">
+                                                        {{ substr($user->name, 0, 1) }}
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-medium">{{ $user->name }}</div>
+                                                        <small class="text-muted">{{ $user->fonction?->nom ?? 'Non spécifié' }}</small>
+                                                    </div>
+                                                </div>
+                                            @endforeach
                                         </div>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
 
+                                <td>
+                                    @if($tache->taskdocuments->isNotEmpty())
+                                        <ul class="list-unstyled mb-0">
+                                            @foreach($tache->taskdocuments as $doc)
+                                                <li>
+                                                    <a href="{{ asset('storage/' . $doc->chemin) }}" target="_blank">
+                                                        <i class="fas fa-file-alt me-1"></i>{{ $doc->nom_original }}
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
                                 <td>
                                     <div class="d-flex flex-column">
                                         <small class="text-muted"><i class="fas fa-play-circle me-1"></i> {{ $tache->date_debut->format('d/m/Y') }}</small>

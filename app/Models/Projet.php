@@ -65,5 +65,10 @@ class Projet extends Model
     {
         return $this->hasMany(Commentaire::class);
     }
+    public function messages()
+    {
+        return $this->hasMany(ProjectMessage::class);
+    }
+
 
 }

@@ -11,12 +11,14 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Chef\TacheController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Chef\ProjetController;
+use App\Http\Controllers\Chef\ChatController;
 use App\Http\Controllers\Chef\ChefEquipeCommentaireController;
 use App\Http\Controllers\Collaborateur\CollaborateurController;
 use App\Http\Controllers\Collaborateur\TacheCommentaireController;
 use App\Http\Controllers\Chef\ChefEquipeController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
+
 
 
 
@@ -82,6 +84,7 @@ Route::middleware(['auth', 'isChefEquipe'])
             Route::put('/{tache}', [TacheController::class, 'update'])->name('update');
             Route::delete('/{tache}', [TacheController::class, 'destroy'])->name('destroy');
             
+            
             // Routes supplémentaires pour Kanban
             Route::get('/kanban', [TacheController::class, 'kanban'])->name('kanban');
             Route::post('/update-status', [TacheController::class, 'updateStatus'])->name('update-status');
@@ -89,6 +92,8 @@ Route::middleware(['auth', 'isChefEquipe'])
         });
     
     });
+    // Gestion des documents d'une tâche
+            Route::delete('/documents/{taskdocument}', [TacheController::class, 'destroyDocument'])->name('documents.destroy');
     Route::delete('documents/{document}', [ProjetController::class, 'destroyDocument'])
                 ->name('documents.destroy');
 
@@ -100,14 +105,28 @@ Route::middleware(['auth', 'isChefEquipe'])
 
     Route::delete('/commentaires/{commentaire}', [ChefEquipeCommentaireController::class, 'destroy'])
         ->name('commentaires.destroy');
+    Route::get('commentaires/{commentaire}/edit', [ChefEquipeCommentaireController::class, 'edit'])->name('chef.commentaire.edit');
+    Route::patch('commentaires/{commentaire}', [ChefEquipeCommentaireController::class, 'update'])->name('chef.commentaire.update');
     // Kanban par projet
     // Chef équipe : liste des projets où il est membre
     Route::get('/suivi', [ChefEquipeController::class, 'suivi'])->name('suivi');
 
     // Kanban d'un projet
     Route::get('/kanban/{projet}', [ChefEquipeController::class, 'kanbanProjet'])->name('kanban');
+   
+    // Liste des projets pour lesquels l'utilisateur peut discuter
+    Route::get('/projets/discussions', [ChatController::class, 'projetsDiscussion'])
+        ->name('project_messages.projet_list');
 
+    // Afficher les messages d’un projet spécifique
+    Route::get('/projets/{projet}/messages', [ChatController::class, 'showProjetMessages'])
+        ->name('project_messages.index');
 
+    // Ajouter un message à un projet spécifique
+    Route::post('/projets/{projet}/messages', [ChatController::class, 'storeMessage'])
+        ->name('project_messages.store');
+        Route::get('/projet/{projet}/users', [ChatController::class,'projectUsers'])
+     ->name('project_users');
 
 });
 
@@ -151,7 +170,19 @@ Route::middleware(['auth', 'isCollaborateur'])->group(function () {
     Route::delete('/{commentaire}', [TacheCommentaireController::class, 'destroy']);
 
     });
+     // Liste des projets pour lesquels le collaborateur peut discuter
+    Route::get('/projets/discussions', [App\Http\Controllers\Collaborateur\ChatController::class, 'projetsDiscussion'])
+        ->name('projet_messages.projet_list');
 
+    // Afficher les messages d’un projet spécifique
+    Route::get('/projets/{projet}/messages', [App\Http\Controllers\Collaborateur\ChatController::class, 'showProjetMessages'])
+        ->name('projet_messages.index');
+
+    // Ajouter un message à un projet spécifique
+    Route::post('/projets/{projet}/messages', [App\Http\Controllers\Collaborateur\ChatController::class, 'storeMessage'])
+        ->name('projet_messages.store');
+    Route::get('/projet/{projet}/users', [App\Http\Controllers\Collaborateur\ChatController::class,'projectUsers'])
+     ->name('projet.users');
     Route::get('/collaborateur/profil', [CollaborateurController::class, 'edit'])->name('collaborateur.profil');
     Route::put('/collaborateur/profil', [CollaborateurController::class, 'update']);
     });

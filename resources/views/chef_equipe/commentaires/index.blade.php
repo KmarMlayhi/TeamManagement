@@ -83,6 +83,11 @@
                                                         {{ $reponse->auteur->name }} • <span class="response-time">{{ $reponse->created_at->diffForHumans() }}</span>
                                                         @if($isChef)
                                                             <span class="badge bg-chef-badge text-white ms-2">Chef d'équipe</span>
+                                                            <button class="btn btn-sm btn-outline-primary ms-2 edit-comment" 
+                                                                data-id="{{ $reponse->id }}" 
+                                                                data-contenu="{{ $reponse->contenu }}">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
                                                         @endif
                                                     </small>
                                                     <button class="btn btn-sm btn-outline-danger delete-comment" data-id="{{ $reponse->id }}">
@@ -207,6 +212,57 @@ $(document).ready(function() {
             }
         });
     });
+    // ----- Modifier un commentaire (réponse du chef) -----
+$('body').on('click', '.edit-comment', function() {
+    const button = $(this);
+    const commentId = button.data('id');
+    const commentCard = $('#reponse-' + commentId);
+    const contenuActuel = button.data('contenu');
+
+    // Si un input existe déjà, ne rien faire
+    if (commentCard.find('textarea.edit-input').length) return;
+
+    const textarea = $(`<textarea class="form-control edit-input mb-2">${contenuActuel}</textarea>`);
+    const saveBtn = $('<button class="btn btn-sm btn-success me-1">Enregistrer</button>');
+    const cancelBtn = $('<button class="btn btn-sm btn-secondary">Annuler</button>');
+
+    // Masquer le contenu actuel
+    commentCard.find('p.mb-0').hide();
+    // Ajouter l'input et boutons
+    commentCard.append(textarea).append(saveBtn).append(cancelBtn);
+
+    // Enregistrer la modification
+    saveBtn.on('click', function() {
+        $.ajax({
+            url: '/chef-equipe/commentaires/' + commentId,
+            type: 'PATCH',
+            data: {
+                _token: '{{ csrf_token() }}',
+                contenu: textarea.val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    commentCard.find('p.mb-0').text(response.commentaire.contenu).fadeIn();
+                    textarea.remove();
+                    saveBtn.remove();
+                    cancelBtn.remove();
+                    button.data('contenu', response.commentaire.contenu); // mettre à jour le data
+                }
+            },
+            error: function(xhr) {
+                alert('Erreur lors de la modification: ' + (xhr.responseJSON?.message || 'Erreur inconnue'));
+            }
+        });
+    });
+
+    // Annuler la modification
+    cancelBtn.on('click', function() {
+        textarea.remove();
+        saveBtn.remove();
+        cancelBtn.remove();
+        commentCard.find('p.mb-0').fadeIn();
+    });
+});
 
     // ----- Préparer la suppression -----
     $('body').on('click', '.delete-comment', function() {
