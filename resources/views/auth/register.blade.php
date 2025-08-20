@@ -75,41 +75,64 @@
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="role" class="form-label">Rôle</label>
+                    <label for="role_id" class="form-label">Rôle</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
-                        <select name="role" id="role" class="form-select" required>
+                        <select name="role_id" id="role_id" class="form-select" required>
                             <option value="">Sélectionner un rôle</option>
-                            <option value="collaborateur">Collaborateur</option>
-                            <option value="admin">Administrateur</option>
-                            <option value="chef_equipe">Chef d'Équipe</option>
+                            @foreach($roles as $role)
+                                <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
+                                    {{ $role->name }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                 </div>
                 <div class="col-md-6 mb-3">
-                <label for="grade" class="form-label">Grade</label>
+                <label for="grade_id" class="form-label">Grade</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-award"></i></span>
-                    <select name="grade" id="grade" class="form-select">
+                   <select name="grade_id" id="grade_id" class="form-select" required>
                         <option value="">Sélectionner un grade</option>
-                        <option value="G1">G1</option>
-                        <option value="G2">G2</option>
-                        <option value="G3">G3</option>
-                        <option value="G4">G4</option>
-                        <option value="G5">G5</option>
+                        @foreach($grades as $grade)
+                            <option value="{{ $grade->id }}" {{ old('grade_id') == $grade->id ? 'selected' : '' }}>
+                                {{ $grade->nom }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
             </div>
-            </div>
-            <div class="row">
-            <!-- Ajoutez ces champs après le champ "Poste" -->
             
-
-            <div class="col-md-6 mb-3">
-                <label for="fonction" class="form-label">Fonction</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-user-tie"></i></span>
-                    <input type="text" name="fonction" id="fonction" class="form-control" placeholder="Votre fonction spécifique">
+            <div class="row">
+                <!-- Ajoutez ces champs après le champ "Poste" -->
+                <div class="col-md-6 mb-3">
+                    <label for="fonction_id" class="form-label">Fonction</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-award"></i></span>
+                        <select name="fonction_id" id="fonction_id" class="form-select" required>
+                            <option value="">Sélectionner une fonction</option>
+                            @foreach($fonctions as $fonction)
+                                <option value="{{ $fonction->id }}" {{ old('fonction_id') == $fonction->id ? 'selected' : '' }}>
+                                    {{ $fonction->nom }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            
+                <div class="col-md-6 mb-3">
+                    <label for="direction_id" class="form-label">Direction</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-building"></i></span>
+                        <select name="direction_id" id="direction_id" class="form-select" required>
+                            <option value="">Sélectionner une direction</option>
+                            @foreach($directions as $direction)
+                                <option value="{{ $direction->id }}" {{ old('direction_id') == $direction->id ? 'selected' : '' }}>
+                                    {{ $direction->nom }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>

@@ -28,75 +28,6 @@
         </div>
     @endif
 
-    <!-- Stats Cards -->
-    <div class="row mb-4 stats-row">
-        <div class="col-md-3 mb-3">
-            <div class="card stats-card pending">
-                <div class="card-body py-2">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-user-clock card-icon"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="card-title mb-1">En attente</h5=6>
-                            <h4 class="mb-0">{{ $pendingCollaborateurs + $pendingChefs }}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3 mb-3">
-            <div class="card stats-card collaborators">
-                <div class="card-body py-2">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-users card-icon"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="card-title mb-1">Collaborateurs</h6>
-                            <h4 class="mb-0">{{ $totalCollaborateurs }}</h4>
-                            <small class="stats-subtext">{{ $totalCollaborateurs - $pendingCollaborateurs }} validés</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3 mb-3">
-            <div class="card stats-card chefs">
-                <div class="card-body py-2">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-user-tie card-icon"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="card-title mb-1">Chefs d'Équipe</h6>
-                            <h4 class="mb-0">{{ $totalChefs }}</h4>
-                            <small class="stats-subtext">{{ $totalChefs - $pendingChefs }} validés</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3 mb-3">
-            <div class="card stats-card validated">
-                <div class="card-body py-2">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-user-check card-icon"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="card-title mb-1">Total Validés</h6>
-                            <h4 class="mb-0">{{ ($totalCollaborateurs - $pendingCollaborateurs) + ($totalChefs - $pendingChefs) }}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Users Table -->
     <div class="card dashboard-card">
         <div class="card-body">
@@ -122,7 +53,7 @@
                 </form>
             </div>
             
-            @if($users->isEmpty()))
+            @if($users->isEmpty())
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>Aucun utilisateur à afficher.
                 </div>
@@ -131,36 +62,19 @@
                     <table class="user-management-table">
                         <thead>
                             <tr>
+                                <th>Statut</th>
                                 <th>Grade</th>
                                 <th>Nom</th>
                                 <th>Email</th>
+                                <th>Direction</th>
                                 <th>Rôle</th>
-                                <th>Statut</th>
                                 <th>Inscription</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($users as $user)
-                                <tr>
-                                    <td>{{ $user->grade }}</td>
-                                    <td>{{ $user->name }}</td>
-                                    <td>{{ $user->email }}</td>
-                                    <td>
-                                        @if($user->role === 'chef_equipe')
-                                            <span class="badge badge-chef">
-                                                <i class="fas fa-user-tie me-1"></i> Chef d'Équipe
-                                            </span>
-                                        @elseif($user->role === 'admin')
-                                            <span class="badge badge-admin">
-                                                <i class="fas fa-user-shield me-1"></i> Admin
-                                            </span>
-                                        @else
-                                            <span class="badge badge-collaborator">
-                                                <i class="fas fa-user me-1"></i> Collaborateur
-                                            </span>
-                                        @endif
-                                    </td>
+                                <tr>   
                                     <td>
                                         @if($user->is_validated)
                                             <span class="status-badge status-validated">
@@ -172,10 +86,41 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
+                                    <td>{{ $user->grade ? $user->grade->nom : 'Aucun grade' }}</td>
+                                    <td>{{ $user->name }}</td>
+                                    <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" 
+                                        title="{{ $user->email }}" 
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top">
+                                        {{ $user->email }}
+                                    </td>
+                                    <td>{{ $user->direction ? $user->direction->nom : 'Aucune direction' }}</td>
+                                    <td>
+                                        @php $roleName = $user->role?->name ?? 'inconnu'; @endphp
+
+                                        @if($roleName === 'chef_equipe')
+                                            <span class="badge badge-chef">
+                                                <i class="fas fa-user-tie me-1"></i> Chef d'Équipe
+                                            </span>
+                                        @elseif($roleName === 'admin')
+                                            <span class="badge badge-admin">
+                                                <i class="fas fa-user-shield me-1"></i> Admin
+                                            </span>
+                                        @elseif($roleName === 'collaborateur')
+                                            <span class="badge badge-collaborator">
+                                                <i class="fas fa-user me-1"></i> Collaborateur
+                                            </span>
+                                        @else
+                                            <span class="badge badge-secondary">
+                                                {{ ucfirst($roleName) }}
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td> {{ $user->created_at->format('d/m/Y') }}<br>
+    {{ $user->created_at->format('H:i') }}</td>
                                     <td>
                                         <div class="action-buttons">
-                                            @if(!$user->is_validated && $user->role !== 'admin')
+                                            @if(!$user->is_validated && $roleName !== 'admin')
                                                 <form action="{{ route('admin.users.validate', $user) }}" method="POST">
                                                     @csrf
                                                     <button type="submit" class="btn btn-validate" title="Valider">
@@ -183,7 +128,7 @@
                                                     </button>
                                                 </form>
                                             @endif
-                                             @if($user->is_validated && $user->role !== 'admin')
+                                            @if($user->is_validated && $roleName !== 'admin')
                                                 <form action="{{ route('admin.users.suspend', $user) }}" method="POST">
                                                     @csrf
                                                     <button type="submit" class="btn btn-sm btn-warning" title="Suspendre">
@@ -191,10 +136,10 @@
                                                     </button>
                                                 </form>
                                             @endif
-                                            @if($user->role !== 'admin')
+                                            @if($roleName !== 'admin')
                                                 <form action="{{ route('admin.users.delete', $user) }}" method="POST">
                                                     @csrf @method('DELETE')
-                                                    <button type="submit" class="btn btn-delete"   title="Supprimer"
+                                                    <button type="submit" class="btn btn-delete" title="Supprimer"
                                                         onclick="return confirm('Confirmer la suppression de {{ $user->name }} ?')">
                                                         <i class="fas fa-trash-alt"></i>
                                                     </button>

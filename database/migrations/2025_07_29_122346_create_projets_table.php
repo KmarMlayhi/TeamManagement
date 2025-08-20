@@ -17,12 +17,8 @@ return new class extends Migration
             $table->date('date_fin_reelle')->nullable();
             $table->enum('statut', ['en_attente', 'en_cours', 'termine', 'suspendu'])->default('en_attente');
             $table->string('client')->nullable();
-            $table->text('details_importants')->nullable();
-            $table->string('cahier_charge_path')->nullable();
             $table->decimal('budget', 12, 2)->nullable();
-            // $table->string('reference_officielle')->nullable();
             $table->integer('avancement')->default(0);
-            // $table->string('cadre_juridique')->nullable();
             $table->unsignedBigInteger('equipe_id')->nullable();
             $table->foreign('equipe_id')
                     ->references('id')
@@ -31,10 +27,22 @@ return new class extends Migration
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
         });
+
+        // Création de la table pour les documents
+        Schema::create('documents', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('projet_id')->constrained()->onDelete('cascade');
+            $table->string('nom');
+            $table->string('chemin');
+            $table->string('type');
+            $table->unsignedInteger('taille');
+            $table->timestamps();
+        });
     }
 
     public function down()
     {
+        Schema::dropIfExists('documents');
         Schema::dropIfExists('projets');
     }
 };

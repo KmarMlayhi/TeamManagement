@@ -23,9 +23,11 @@ return new class extends Migration
             $table->string('role')->default('collaborateur'); // rôle: admin ou collaborateur
             $table->boolean('is_validated')->default(false);  // validé ou pas par un admin
             $table->string('avatar')->nullable();             // photo de profil
-            $table->string('grade')->nullable(); // G1 à G5
-            $table->string('fonction')->nullable(); // Fonction personnalisée            // poste dans l’entreprise
-
+            // $table->string('grade')->nullable(); // G1 à G5
+            // $table->string('fonction')->nullable(); // Fonction personnalisée           
+            $table->foreignId('grade_id')->nullable()->constrained('grades')->onDelete('set null');
+            $table->foreignId('fonction_id')->nullable()->constrained('fonctions')->onDelete('set null');
+            $table->foreignId('direction_id')->nullable()->constrained('directions')->onDelete('set null');
             $table->rememberToken();                // token pour "remember me"
             $table->timestamps();                   // created_at et updated_at
         });
