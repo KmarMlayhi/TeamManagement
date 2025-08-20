@@ -19,7 +19,7 @@ use App\Http\Controllers\Chef\ChefEquipeController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\ProfileController;
-
+use App\Http\Controllers\Chef\MeetingController;
 
 
 
@@ -80,8 +80,9 @@ Route::middleware(['auth', 'isChefEquipe'])
         Route::get('/{projet}/edit', [ProjetController::class, 'edit'])->name('edit');
         Route::put('/{projet}', [ProjetController::class, 'update'])->name('update');
         Route::delete('/{projet}', [ProjetController::class, 'destroy'])->name('destroy');
-        
-        
+        Route::get('/{projet}/reunion', [MeetingController::class, 'createMeeting'])
+        ->name('reunion');
+
          Route::prefix('{projet}/taches')->name('taches.')->group(function () {
             Route::get('/', [TacheController::class, 'index'])->name('index');
             Route::get('/create', [TacheController::class, 'create'])->name('create');
@@ -100,6 +101,11 @@ Route::middleware(['auth', 'isChefEquipe'])
         });
     
     });
+
+    // Route::get('/reunion/create', [MeetingController::class, 'createMeeting'])
+    //         ->name('reunion.create');
+
+
     // Gestion des documents d'une tâche
             Route::delete('/documents/{taskdocument}', [TacheController::class, 'destroyDocument'])->name('documents.destroy');
     Route::delete('documents/{document}', [ProjetController::class, 'destroyDocument'])
@@ -142,6 +148,9 @@ Route::middleware(['auth', 'isChefEquipe'])
 Route::middleware(['auth', 'isCollaborateur'])->group(function () {
     // Tableau de bord collaborateur
     Route::get('/collaborateur/home', [CollaborateurController::class, 'home'])->name('collaborateur.home');
+    Route::get('/collaborateur/notification/{id}/read', [CollaborateurController::class, 'markNotificationRead'])
+    ->name('collaborateur.notification.read');
+
 
     // Accès aux équipes (affichage uniquement)
     Route::get('/collaborateur/equipes', [CollaborateurController::class, 'equipesIndex'])->name('collaborateur.equipes.index');

@@ -87,5 +87,16 @@ class Projet extends Model
         $this->avancement = $this->calculerAvancement();
         $this->save();
     }
+    
+    public function collaborateurs()
+    {
+        $users = collect();
+
+        foreach ($this->equipes as $equipe) {
+            $users = $users->merge($equipe->utilisateurs); // récupère tous les utilisateurs de l'équipe
+        }
+
+        return $users->unique('id'); // évite les doublons si un utilisateur est dans plusieurs équipes
+}
 
 }

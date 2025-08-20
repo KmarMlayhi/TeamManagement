@@ -21,11 +21,14 @@
         <h2 class="mb-0" style="color: var(--secondary-color);">
             <i class="fas fa-project-diagram me-2"></i>Gestion des Projets
         </h2>
-        <a href="{{ route('chef_equipe.projets.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-1"></i> Nouveau projet
-        </a>
+
+        <div class="d-flex gap-2">
+            <a href="{{ route('chef_equipe.projets.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> Nouveau projet
+            </a>
+        </div>
     </div>
-    
+
     <div class="card mb-4">
         <div class="card-body">
             <form action="{{ route('chef_equipe.projets.index') }}" method="GET">
@@ -129,13 +132,19 @@
                                         <a href="{{ route('chef_equipe.projets.edit', $projet) }}" class="btn btn-sm btn-outline-primary" title="Modifier">
                                             <i class="fas fa-edit"></i>
                                         </a>
+                                    
                                         <form action="{{ route('chef_equipe.projets.destroy', $projet) }}" method="POST" class="d-inline">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer"
                                                     onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
-                                        </form>
+                                        </form> 
+                                        <a href="{{ route('chef_equipe.projets.reunion', $projet->id) }}" 
+                                            class="btn btn-outline-success btn-sm" title="Créer une réunion">
+                                                <i class="fas fa-video me-1"></i> 
+                                        </a>
+
                                     </div>
                                 </td>
                             </tr>

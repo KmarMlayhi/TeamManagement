@@ -12,39 +12,49 @@ use Illuminate\Support\Facades\Auth;
 
 class CollaborateurController extends Controller
 {
-public function home()
-{
-    $user = auth()->user();
 
-    // Projets liés aux équipes de l'utilisateur
-    $mesProjets = $user->equipes()
-        ->with('projets')
-        ->get()
-        ->pluck('projets')
-        ->flatten()
-        ->unique('id');
+    public function home()
+    {
+        $user = Auth::user();
 
-    // Vérifier si la relation taches existe et récupérer les tâches assignées
-    $taches = $user->relationLoaded('taches') ? $user->taches : $user->taches()->get();
+        // --- Projets comme avant ---
+        $mesProjets = $user->equipes()
+            ->with('projets')
+            ->get()
+            ->pluck('projets')
+            ->flatten()
+            ->unique('id');
 
-    // Stats des tâches
-    $tachesEnCours = $taches ? $taches->where('statut', 'en_cours')->count() : 0;
-    $tachesTerminees = $taches ? $taches->where('statut', 'termine')->count() : 0;
-    $tachesEnRetard = $taches ? $taches->filter(function($tache) {
-        return $tache->date_fin_prevue && $tache->date_fin_prevue < now() && $tache->statut != 'termine';
-    })->count() : 0;
+        // --- Tâches comme avant ---
+        $taches = $user->relationLoaded('taches') ? $user->taches : $user->taches()->get();
+        $tachesEnCours = $taches ? $taches->where('statut', 'en_cours')->count() : 0;
+        $tachesTerminees = $taches ? $taches->where('statut', 'termine')->count() : 0;
+        $tachesEnRetard = $taches ? $taches->filter(function($tache) {
+            return $tache->date_fin_prevue && $tache->date_fin_prevue < now() && $tache->statut != 'termine';
+        })->count() : 0;
 
-    // Projets récents (triés par date de création)
-    $projetsRecents = $mesProjets ? $mesProjets->sortByDesc('created_at')->take(3) : collect();
+        $projetsRecents = $mesProjets ? $mesProjets->sortByDesc('created_at')->take(3) : collect();
 
-    return view('collaborateur.home', compact(
-        'mesProjets', 
-        'tachesEnCours', 
-        'tachesTerminees', 
-        'tachesEnRetard', 
-        'projetsRecents'
-    ));
-}
+        // --- Charger les notifications non lues ---
+        $notifications = $user->unreadNotifications;
+
+        return view('collaborateur.home', compact(
+            'mesProjets', 
+            'tachesEnCours', 
+            'tachesTerminees', 
+            'tachesEnRetard', 
+            'projetsRecents',
+            'notifications'
+        ));
+
+    }
+    public function markNotificationRead($id)
+    {
+        $notification = auth()->user()->notifications()->findOrFail($id);
+        $notification->markAsRead();
+
+        return redirect($notification->data['lien']);
+    }
 
 
     public function equipesIndex()

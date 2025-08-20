@@ -207,12 +207,13 @@
 
         <!-- Projets récents -->
         <div class="card mt-4 recent-activity">
+        <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between">
                 <div>
                     <i class="fas fa-folder me-2"></i> 
                     <span>Mes projets récents</span>
                 </div>
-                <a href="{{ route('collaborateur.projets.index') }}" class="btn btn-sm btn-outline-primary">
+                <a href="{{ route('collaborateur.equipes.index') }}" class="btn btn-sm btn-outline-primary">
                     Voir tous <i class="fas fa-arrow-right ms-1"></i>
                 </a>
             </div>
@@ -245,6 +246,37 @@
                     @endforelse
                 </ul>
             </div>
+        </div>
+            <!-- Notifications Réunions -->
+            <div class="card mt-4 notifications">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <div>
+                        <i class="fas fa-bell me-2"></i>
+                        <span>Réunions à venir</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        @forelse($notifications as $notification)
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-video text-primary me-2"></i>
+                                    {{ $notification->data['message'] }}
+                                </div>
+                                <a href="{{ route('collaborateur.notification.read', $notification->id) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    Rejoindre
+                                </a>
+                            </li>
+                        @empty
+                            <li class="list-group-item text-muted text-center py-4">
+                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                <p>Aucune réunion prévue</p>
+                            </li>
+                        @endforelse
+                    </ul>
+                </div>
+            </div>
+
         </div>
     </div>
     @endsection
