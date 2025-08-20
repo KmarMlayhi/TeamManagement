@@ -60,5 +60,21 @@ class Tache extends Model
     {
         return $this->hasMany(Commentaire::class);
     }
+    
+    protected static function booted()
+    {
+        static::saved(function ($tache) {
+            if ($tache->projet) {
+                $tache->projet->mettreAJourAvancement();
+            }
+        });
+
+        static::deleted(function ($tache) {
+            if ($tache->projet) {
+                $tache->projet->mettreAJourAvancement();
+            }
+        });
+    }
+
 
 }

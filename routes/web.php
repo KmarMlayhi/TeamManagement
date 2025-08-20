@@ -18,6 +18,7 @@ use App\Http\Controllers\Collaborateur\TacheCommentaireController;
 use App\Http\Controllers\Chef\ChefEquipeController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\ProfileController;
 
 
 
@@ -33,8 +34,14 @@ Route::post('/register', [RegisterController::class, 'store']);
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 
-//Routes Admin 
 
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profil', [ProfileController::class, 'show'])->name('profil.show');
+    Route::post('/profil', [ProfileController::class, 'update'])->name('profil.update');
+});
+
+//Routes Admin 
 Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::get('/admin/home', [AdminController::class, 'home'])->name('admin.home');
     Route::get('/admin/users', [AdminController::class, 'usersManagement'])->name('admin.users.management');
@@ -44,7 +51,6 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::post('/admin/users/{user}/suspend', [AdminController::class, 'suspendUser'])
      ->name('admin.users.suspend');
 });
-
 
  // Routes Chef 
 Route::middleware(['auth', 'isChefEquipe'])
@@ -83,7 +89,9 @@ Route::middleware(['auth', 'isChefEquipe'])
             Route::get('/{tache}/edit', [TacheController::class, 'edit'])->name('edit');
             Route::put('/{tache}', [TacheController::class, 'update'])->name('update');
             Route::delete('/{tache}', [TacheController::class, 'destroy'])->name('destroy');
-            
+            Route::post('/{tache}/upload-document', [TacheController::class, 'uploadDocument'])
+                        ->name('uploadDocument');
+
             
             // Routes supplémentaires pour Kanban
             Route::get('/kanban', [TacheController::class, 'kanban'])->name('kanban');
@@ -168,6 +176,12 @@ Route::middleware(['auth', 'isCollaborateur'])->group(function () {
     Route::post('/commentaires', [TacheCommentaireController::class, 'store'])->name('collaborateur.taches.commentaires.store');
     Route::put('/{commentaire}', [TacheCommentaireController::class, 'update']);
     Route::delete('/{commentaire}', [TacheCommentaireController::class, 'destroy']);
+    Route::get('/documents', [CollaborateurController::class, 'getDocuments'])
+        ->name('collaborateur.taches.documents');
+    Route::post('/documents', [CollaborateurController::class, 'uploadDocument'])
+        ->name('collaborateur.taches.documents.upload');
+    Route::delete('/documents/{document}', [CollaborateurController::class, 'deleteDocument'])
+        ->name('collaborateur.taches.documents.delete');
 
     });
      // Liste des projets pour lesquels le collaborateur peut discuter

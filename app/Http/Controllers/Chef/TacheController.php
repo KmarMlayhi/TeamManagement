@@ -83,6 +83,9 @@ class TacheController extends Controller
                     'tache_id' => $tache->id,
                     'nom_original' => $file->getClientOriginalName(),
                     'chemin' => $path,
+                    'uploaded_by' => Auth::id(),
+                    'parent_id' => null,
+                    'version' => 1,
                 ]);
             }
         }
@@ -136,12 +139,45 @@ class TacheController extends Controller
                     'tache_id' => $tache->id,
                     'nom_original' => $file->getClientOriginalName(),
                     'chemin' => $path,
+                    'uploaded_by' => Auth::id(),
+                    'parent_id' => null,
+                    'version' => 1,
                 ]);
             }
         }
 
         return redirect()->route('chef_equipe.projets.taches.index', $projet)
             ->with('success', 'Tâche mise à jour avec succès.');
+    }
+    public function uploadDocument(Request $request, Projet $projet, Tache $tache)
+    {
+        $request->validate([
+            'document' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,png,jpg,jpeg|max:10240',
+            'parent_id' => 'nullable|exists:taskdocuments,id'
+        ]);
+
+        $file = $request->file('document');
+        $path = $file->store('documents/taches/' . $tache->id, 'public');
+
+        $parent = Taskdocument::find($request->parent_id);
+        if ($parent) {
+            $lastVersion = Taskdocument::where('id', $parent->id)
+                            ->orWhere('parent_id', $parent->id)
+                            ->max('version');
+            $version = $lastVersion + 1; 
+        } else {
+            $version = 1; 
+        }
+        $doc = Taskdocument::create([
+            'tache_id' => $tache->id,
+            'nom_original' => $file->getClientOriginalName(),
+            'chemin' => $path,
+            'uploaded_by' => Auth::id(),
+            'parent_id' => $parent?->id,
+            'version' => $version
+        ]);
+        return redirect()->route('chef_equipe.projets.taches.index', $projet)
+                     ->with('success', 'Document ajouté avec succès !');
     }
 
     public function destroy(Projet $projet, Tache $tache)

@@ -350,36 +350,100 @@
                 margin-top: 20px;
             }
 
-@media (max-width: 1200px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .stats-grid,
-    .feature-grid {
-        grid-template-columns: 1fr;
-    }
-    .feature-card,
-    .stat-card {
-        padding: 1rem;
-    }
-}
-
-/* .stat-card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
-    transition: all 0.3s ease;
-    text-align: center;
-}
-
-.stat-number {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin: 10px 0;
-} */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
+
+        @media (max-width: 768px) {
+            .stats-grid,
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            .feature-card,
+            .stat-card {
+                padding: 1rem;
+            }
+        } }
+
+  /* Corrections et améliorations supplémentaires */
+        .stats-row {
+            margin-top: 2rem;
+        }
+        
+        .clickable-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            height: 100%;
+        }
+        
+        .clickable-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        .card-icon-container {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            background: rgba(0, 86, 179, 0.1);
+        }
+        
+        .card-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1.2;
+        }
+        
+        .card-text-content h6 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .progress {
+            height: 8px;
+            width: 100px;
+            margin: 0 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .project-status {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .progress {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+            
+            .list-group-item {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 0.5rem;
+            } }

@@ -5,16 +5,47 @@ namespace App\Http\Controllers\Collaborateur;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Equipe;
+use App\Models\Taskdocument;
 use App\Models\Tache;
 use App\Models\Projet;
 use Illuminate\Support\Facades\Auth;
 
 class CollaborateurController extends Controller
 {
-    public function home()
-    {
-        return view('collaborateur.home');
-    }
+public function home()
+{
+    $user = auth()->user();
+
+    // Projets liés aux équipes de l'utilisateur
+    $mesProjets = $user->equipes()
+        ->with('projets')
+        ->get()
+        ->pluck('projets')
+        ->flatten()
+        ->unique('id');
+
+    // Vérifier si la relation taches existe et récupérer les tâches assignées
+    $taches = $user->relationLoaded('taches') ? $user->taches : $user->taches()->get();
+
+    // Stats des tâches
+    $tachesEnCours = $taches ? $taches->where('statut', 'en_cours')->count() : 0;
+    $tachesTerminees = $taches ? $taches->where('statut', 'termine')->count() : 0;
+    $tachesEnRetard = $taches ? $taches->filter(function($tache) {
+        return $tache->date_fin_prevue && $tache->date_fin_prevue < now() && $tache->statut != 'termine';
+    })->count() : 0;
+
+    // Projets récents (triés par date de création)
+    $projetsRecents = $mesProjets ? $mesProjets->sortByDesc('created_at')->take(3) : collect();
+
+    return view('collaborateur.home', compact(
+        'mesProjets', 
+        'tachesEnCours', 
+        'tachesTerminees', 
+        'tachesEnRetard', 
+        'projetsRecents'
+    ));
+}
+
 
     public function equipesIndex()
     {
@@ -263,4 +294,102 @@ class CollaborateurController extends Controller
         $projets = Projet::whereHas('equipes.utilisateurs', fn($q) => $q->where('users.id', $userId))->get();
         return view('collaborateur.suivi', compact('projets'));
     }
+public function getDocuments(Tache $tache)
+{
+    $documents = Taskdocument::where('tache_id', $tache->id)
+        ->whereNull('parent_id')
+        ->with([
+            'versions' => function($q) {
+                $q->with('uploader')->orderBy('version', 'asc');
+            },
+            'uploader'
+        ])
+        ->get();
+
+    $data = $documents->map(function($doc) {
+        return [
+            'id' => $doc->id,
+            'nom_original' => $doc->nom_original,
+            'version' => $doc->version, // <-- version réelle de la DB
+            'uploader' => $doc->uploader?->name ?? 'Inconnu',
+            'uploader_id' => $doc->uploaded_by,
+            'created_at' => $doc->created_at->format('d/m/Y H:i'),
+            'url' => asset('storage/' . $doc->chemin),
+            'versions' => $doc->versions->map(fn($v) => [
+                'id' => $v->id,
+                'nom_original' => $v->nom_original,
+                'version' => $v->version,
+                'uploader' => $v->uploader?->name ?? 'Inconnu',
+                'uploader_id' => $v->uploaded_by,
+                'created_at' => $v->created_at->format('d/m/Y H:i'),
+                'url' => asset('storage/' . $v->chemin),
+            ]),
+        ];
+    });
+
+    return response()->json(['success' => true, 'documents' => $data]);
+}
+
+
+public function uploadDocument(Request $request, Tache $tache)
+{
+    $request->validate([
+        'document' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,png,jpg,jpeg|max:10240',
+        'parent_id' => 'nullable|exists:taskdocuments,id'
+    ]);
+
+    $file = $request->file('document');
+    $path = $file->store('documents/taches/' . $tache->id, 'public');
+
+    $parent = Taskdocument::find($request->parent_id);
+
+   if ($parent) {
+    // Chercher la version du parent et de tous ses enfants
+    $lastVersion = Taskdocument::where('id', $parent->id)
+                    ->orWhere('parent_id', $parent->id)
+                    ->max('version');
+    $version = $lastVersion + 1; // Nouvelle version = dernière version + 1
+} else {
+    $version = 1; // Premier document
+}
+
+
+
+    $doc = Taskdocument::create([
+        'tache_id' => $tache->id,
+        'nom_original' => $file->getClientOriginalName(),
+        'chemin' => $path,
+        'uploaded_by' => Auth::id(),
+        'parent_id' => $parent?->id,
+        'version' => $version
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'document' => [
+            'id' => $doc->id,
+            'nom_original' => $doc->nom_original,
+            'version' => $doc->version,
+            'uploader' => $doc->uploader?->name ?? 'Inconnu',
+            'created_at' => $doc->created_at->format('d/m/Y H:i'),
+            'url' => asset('storage/' . $doc->chemin),
+            'parent_id' => $doc->parent_id
+        ]
+    ]);
+}
+
+
+
+public function deleteDocument(Tache $tache, Taskdocument $document)
+{
+    if ($document->uploaded_by !== Auth::id()) {
+        return response()->json(['success' => false, 'message' => 'Vous ne pouvez pas supprimer ce document'], 403);
+    }
+
+    $document->delete();
+    return response()->json(['success' => true]);
+}
+
+
+
 }

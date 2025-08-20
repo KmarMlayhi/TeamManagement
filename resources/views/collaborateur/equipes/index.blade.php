@@ -24,7 +24,10 @@
     <div class="card dashboard-card">
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-list me-2"></i>Équipes auxquelles j'appartiens</h5>
-        </div>
+            <span class="small text-muted">
+                 Parcourez vos équipes pour découvrir vos projets
+            </span>
+
 
         <div class="card-body">
             @if($equipes->isEmpty())

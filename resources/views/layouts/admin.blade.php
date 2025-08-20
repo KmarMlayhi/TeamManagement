@@ -14,12 +14,14 @@
 <body>
 
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <!-- Logo et Titres dans la sidebar -->
         <div class="logo-sidebar-container text-center py-3">
+            <a href="{{ route('admin.home') }}">
             <img src="{{ asset('images/logo_tunis.png') }}"
                  alt="Drapeau Tunisien"
                  class="logo-sidebar mb-2">
+            </a>
             <h4 class="text-white mb-1">République Tunisienne</h4>
             <p class="text-white-50 small mb-0">Ministère de l'équipement et de l'habitat</p>
         </div>
@@ -30,9 +32,6 @@
             </li>
             <li class="{{ Request::routeIs('admin.users.management') ? 'active' : '' }}">
                 <a href="{{ route('admin.users.management') }}"><i class="fas fa-users"></i> Gestion des utilisateurs </a>
-            </li>
-            <li>
-                <a href="#"><i class="fas fa-cog"></i> Paramètres</a>
             </li>
         </ul>
     </div>
@@ -49,8 +48,12 @@
                         <i class="fas fa-user-circle me-1"></i> {{ Auth::user()->name }}
                         <span class="badge bg-primary ms-2"> Administrateur</span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profil</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end"> 
+                        <li>
+                            <a class="dropdown-item" href="{{ route('profil.show') }}">
+                                <i class="fas fa-user me-2"></i> Profil
+                            </a>
+                        </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form method="POST" action="{{ route('logout') }}">

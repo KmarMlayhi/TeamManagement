@@ -287,7 +287,7 @@
         <div class="col-lg-8">
             <div class="detail-card">
                 <div class="card-header">
-                    <i class="fas fa-file-alt me-2"></i>Description et commentaires
+                    <i class="fas fa-file-alt me-2"></i>Description et Documents
                 </div>
                 <div class="card-body">
                     <div class="mb-5">
@@ -302,9 +302,10 @@
                                 @foreach($tache->taskdocuments as $doc)
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         <a href="{{ asset('storage/' . $doc->chemin) }}" target="_blank">
-                                            <i class="fas fa-file-alt me-2"></i>{{ $doc->nom_original}}
+                                            <i class="fas fa-file-alt me-2"></i>{{ $doc->nom_original}} 
                                         </a>
                                         <span class="badge bg-secondary">{{ $doc->type }}</span>
+                                        <span>{{ $doc->uploader ? $doc->uploader->name : 'Inconnu' }}</span>
                                     </li>
                                 @endforeach
                             </ul>
@@ -414,112 +415,98 @@
     </div>
 
     <!-- Section pour les commentaires et soumission de travail -->
-    <div class="tabs-card">
-        <div class="card-header">
-            <ul class="nav nav-tabs" id="tacheTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="soumission-tab" data-bs-toggle="tab" data-bs-target="#soumission" type="button" role="tab">
-                        <i class="fas fa-file-upload me-2"></i>Partage Documents
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="commentaires-tab" data-bs-toggle="tab" data-bs-target="#commentaires" type="button" role="tab">
-                        <i class="fas fa-comments me-2"></i>Commentaires partagés
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="historique-tab" data-bs-toggle="tab" data-bs-target="#historique" type="button" role="tab">
-                        <i class="fas fa-history me-2"></i>Historique
-                    </button>
-                </li>
-            </ul>
-        </div>
-        <div class="card-body">
+<div class="tabs-card">
+    <div class="card-header">
+        <ul class="nav nav-tabs" id="tacheTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="soumission-tab" data-bs-toggle="tab" data-bs-target="#soumission" type="button" role="tab">
+                    <i class="fas fa-file-upload me-2"></i> Documents à partager 
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="commentaires-tab" data-bs-toggle="tab" data-bs-target="#commentaires" type="button" role="tab">
+                    <i class="fas fa-comments me-2"></i> Commentaires pour le chef d'équipe
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card-body">
         <div class="tab-content" id="tacheTabsContent">
-        <div class="tab-pane fade show active" id="commentaires" role="tabpanel">
-            <div class="feature-coming">
+            <!-- Documents collaborateur -->
+            <div class="tab-pane fade" id="soumission" role="tabpanel">
+                <div class="collab-documents mt-3">
+                    <h5><i class="fas fa-upload me-2"></i> Vos documents</h5>
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <input type="file" name="document" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="parent_id" class="form-label">Parent (laisser vide si nouveau document)</label>
+                            <select name="parent_id" class="form-select" id="parentSelect">
+                                <option value="">Nouveau document</option>
+                                <!-- Les options seront chargées dynamiquement par JavaScript -->
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Uploader</button>
+                    </form>
+                    
+                    <!-- Conteneur pour les documents de l'utilisateur courant -->
+                    <div class="mt-4">
+                        <h6><i class="fas fa-list me-2"></i>Mes documents soumis</h6>
+                        <ul id="userDocumentsList" class="list-group mt-2">
+                            <!-- Les documents de l'utilisateur seront chargés ici par JavaScript -->
+                            <li class="list-group-item text-muted">Chargement des documents...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+                        <!-- Commentaires -->
+            <div class="tab-pane fade show active" id="commentaires" role="tabpanel">
                 <div id="commentaires-container">
                     <div id="liste-commentaires"></div>
                 </div>
 
-                    @if(Auth::id() === $tache->created_by || $tache->users->contains(Auth::user()))
-                        <form id="form-commentaire">
-                            @csrf
-                            <textarea name="contenu" class="form-control mb-2" placeholder="Écrire un commentaire..." required></textarea>
-                            <button type="submit" class="btn btn-primary btn-sm">Envoyer</button>
-                        </form>
-                    @endif
-                </div>
+                @if(Auth::id() === $tache->created_by || $tache->users->contains(Auth::user()))
+                    <form id="form-commentaire">
+                        @csrf
+                        <textarea name="contenu" class="form-control mb-2" placeholder="Écrire un commentaire..." required></textarea>
+                        <button type="submit" class="btn btn-primary btn-sm">Envoyer</button>
+                    </form>
+                @endif
             </div>
-           
-        </div>
-
-        <div class="tab-pane fade" id="soumission" role="tabpanel">
-            <div class="feature-coming">
-                <div class="feature-icon">
-                    <i class="fas fa-file-upload"></i>
-                </div>
-                <h4 class="mb-3">Fonctionnalité à venir</h4>
-                <p class="text-muted mb-4">
-                    Bientôt, vous pourrez soumettre votre travail directement depuis cette page 
-                    et suivre l'avancement de votre tâche.
-                </p>
-            </div>
-        </div>
-
-        <div class="tab-pane fade" id="historique" role="tabpanel">
-            <div class="feature-coming">
-                <div class="feature-icon">
-                    <i class="fas fa-history"></i>
-                </div>
-                <h4 class="mb-3">Fonctionnalité à venir</h4>
-                <p class="text-muted mb-4">
-                    L'historique des modifications vous montrera bientôt toutes les actions 
-                    effectuées sur cette tâche depuis sa création.
-                </p>
-            </div>
-        </div>
+       </div>
     </div>
 </div>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const tacheId = {{ $tache->id }};
     const userId = {{ Auth::id() }};
     const isAdmin = userId === {{ $tache->created_by }};
+
+    // ---------- COMMENTAIRES ----------
     const listeCommentaires = document.getElementById('liste-commentaires');
     const formCommentaire = document.getElementById('form-commentaire');
-    const textarea = formCommentaire ? formCommentaire.querySelector('textarea[name="contenu"]') : null;
+    const textarea = formCommentaire?.querySelector('textarea[name="contenu"]');
 
     function formatDate(dateString) {
-        const options = { 
-            day: '2-digit', 
-            month: '2-digit', 
-            year: 'numeric',
-            hour: '2-digit', 
-            minute: '2-digit'
-        };
+        const options = { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' };
         return new Date(dateString).toLocaleString('fr-FR', options);
     }
 
     async function loadCommentaires() {
         try {
-            const response = await fetch(`/collaborateur/taches/${tacheId}/commentaires`);
-            if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
-            const data = await response.json();
+            const res = await fetch(`/collaborateur/taches/${tacheId}/commentaires`);
+            const data = await res.json();
 
             if (!data.success || !Array.isArray(data.commentaires)) {
                 listeCommentaires.innerHTML = `<div class="alert alert-info">Aucun commentaire pour l'instant.</div>`;
                 return;
             }
 
-            const commentaires = data.commentaires;
-            if (commentaires.length === 0) {
-                listeCommentaires.innerHTML = `<div class="alert alert-info">Aucun commentaire pour l'instant.</div>`;
-                return;
-            }
-
-            listeCommentaires.innerHTML = commentaires.map(c => {
+            listeCommentaires.innerHTML = data.commentaires.map(c => {
                 const auteurName = c.auteur?.name || 'Utilisateur inconnu';
                 const destinataireName = c.destinataire?.name || 'Toute l\'équipe';
                 const auteurInitial = auteurName.charAt(0).toUpperCase();
@@ -531,34 +518,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="card mb-3" data-comment-id="${c.id}">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-2">
-                                <div class="assignee-avatar me-2" title="${auteurName}">
-                                    ${auteurInitial}
-                                </div>
-                                <div class="flex-grow-1">
-                                    <strong>${auteurName}</strong>
-                                    <span class="text-muted small">→ ${destinataireName}</span>
-                                </div>
+                                <div class="assignee-avatar me-2" title="${auteurName}">${auteurInitial}</div>
+                                <div class="flex-grow-1"><strong>${auteurName}</strong> <span class="text-muted small">→ ${destinataireName}</span></div>
                                 <small class="text-muted">${formatDate(c.created_at)}</small>
                                 ${canEdit ? `
                                 <div class="dropdown ms-2">
-                                    <button class="btn btn-sm btn-link text-muted dropdown-toggle" 
-                                            type="button" data-bs-toggle="dropdown">
+                                    <button class="btn btn-sm btn-link text-muted dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                         <i class="fas fa-ellipsis-v"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
-                                        ${isAuthor ? `
-                                        <li>
-                                            <button class="dropdown-item edit-comment" 
-                                                    data-comment-id="${c.id}">
-                                                <i class="fas fa-edit me-2"></i>Modifier
-                                            </button>
-                                        </li>` : ''}
-                                        <li>
-                                            <button class="dropdown-item delete-comment text-danger"
-                                                    data-comment-id="${c.id}">
-                                                <i class="fas fa-trash me-2"></i>Supprimer
-                                            </button>
-                                        </li>
+                                        ${isAuthor ? `<li><button class="dropdown-item edit-comment" data-comment-id="${c.id}"><i class="fas fa-edit me-2"></i>Modifier</button></li>` : ''}
+                                        <li><button class="dropdown-item delete-comment text-danger" data-comment-id="${c.id}"><i class="fas fa-trash me-2"></i>Supprimer</button></li>
                                     </ul>
                                 </div>` : ''}
                             </div>
@@ -570,137 +540,264 @@ document.addEventListener('DOMContentLoaded', function() {
             }).join('');
 
             setupCommentActions();
-
-        } catch (error) {
-            console.error('Erreur:', error);
-            listeCommentaires.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+        } catch(err) {
+            console.error(err);
+            listeCommentaires.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
         }
     }
 
     function setupCommentActions() {
-        // Suppression
         document.querySelectorAll('.delete-comment').forEach(btn => {
             btn.addEventListener('click', async function() {
-                const commentId = this.dataset.commentId;
+                const id = this.dataset.commentId;
                 if (!confirm('Voulez-vous vraiment supprimer ce commentaire ?')) return;
-
                 try {
-                    const response = await fetch(`/collaborateur/taches/${tacheId}/${commentId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        }
+                    await fetch(`/collaborateur/taches/${tacheId}/${id}`, { 
+                        method:'DELETE', 
+                        headers:{ 'X-CSRF-TOKEN':'{{ csrf_token() }}', 'Accept':'application/json' } 
                     });
-                    if (!response.ok) throw new Error('Erreur lors de la suppression');
                     await loadCommentaires();
-                } catch (error) {
-                    console.error(error);
-                    alert(error.message);
-                }
+                } catch(err) { console.error(err); alert(err.message); }
             });
         });
 
-        // Modification
         document.querySelectorAll('.edit-comment').forEach(btn => {
             btn.addEventListener('click', function() {
-                const commentId = this.dataset.commentId;
-                const commentCard = document.querySelector(`[data-comment-id="${commentId}"]`);
-                const content = commentCard.querySelector('.comment-content').textContent;
+                const id = this.dataset.commentId;
+                const card = document.querySelector(`[data-comment-id="${id}"]`);
+                const content = card.querySelector('.comment-content').textContent;
 
-                commentCard.innerHTML = `
+                card.innerHTML = `
                     <div class="card-body">
-                        <form class="edit-comment-form" data-comment-id="${commentId}">
+                        <form class="edit-comment-form" data-comment-id="${id}">
                             <textarea class="form-control mb-2" required>${content}</textarea>
                             <div class="d-flex justify-content-end gap-2">
-                                <button type="button" class="btn btn-sm btn-outline-secondary cancel-edit">
-                                    Annuler
-                                </button>
-                                <button type="submit" class="btn btn-sm btn-primary">
-                                    Enregistrer
-                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary cancel-edit">Annuler</button>
+                                <button type="submit" class="btn btn-sm btn-primary">Enregistrer</button>
                             </div>
                         </form>
                     </div>
                 `;
 
-                commentCard.querySelector('.cancel-edit').addEventListener('click', async () => {
-                    await loadCommentaires();
-                });
-
-                commentCard.querySelector('.edit-comment-form').addEventListener('submit', async (e) => {
+                card.querySelector('.cancel-edit').addEventListener('click', async () => { await loadCommentaires(); });
+                card.querySelector('.edit-comment-form').addEventListener('submit', async e => {
                     e.preventDefault();
-                    const newContent = e.target.querySelector('textarea').value.trim();
-                    if (!newContent) return alert('Le commentaire ne peut pas être vide');
-
-                    try {
-                        const response = await fetch(`/collaborateur/taches/${tacheId}/${commentId}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Accept': 'application/json'
+                    const val = e.target.querySelector('textarea').value.trim();
+                    if(!val) return alert('Le commentaire ne peut pas être vide');
+                    try{
+                        await fetch(`/collaborateur/taches/${tacheId}/${id}`, {
+                            method:'PUT',
+                            headers:{
+                                'Content-Type':'application/json',
+                                'X-CSRF-TOKEN':'{{ csrf_token() }}',
+                                'Accept':'application/json'
                             },
-                            body: JSON.stringify({ contenu: newContent })
+                            body: JSON.stringify({ contenu: val })
                         });
-                        if (!response.ok) throw new Error('Erreur lors de la modification');
                         await loadCommentaires();
-                    } catch (error) {
-                        console.error(error);
-                        alert(error.message);
-                    }
+                    } catch(err){ console.error(err); alert(err.message); }
                 });
             });
         });
     }
 
-    // Ajouter un nouveau commentaire
-    if(formCommentaire) {
-        formCommentaire.addEventListener('submit', async function(e) {
+    if(formCommentaire){
+        formCommentaire.addEventListener('submit', async e => {
             e.preventDefault();
-            const content = textarea.value.trim();
-            if (!content) return alert('Veuillez écrire un commentaire');
-
-            try {
-                const response = await fetch(`/collaborateur/taches/${tacheId}/commentaires`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ contenu: content })
+            const val = textarea.value.trim();
+            if(!val) return alert('Veuillez écrire un commentaire');
+            try{
+                await fetch(`/collaborateur/taches/${tacheId}/commentaires`, {
+                    method:'POST',
+                    headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},
+                    body: JSON.stringify({ contenu: val })
                 });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Erreur serveur');
-                }
-                textarea.value = '';
+                textarea.value='';
                 await loadCommentaires();
-            } catch (error) {
-                console.error('Erreur:', error);
-                alert(error.message || 'Erreur lors de l\'envoi du commentaire');
-            }
+            }catch(err){ console.error(err); alert(err.message||'Erreur serveur'); }
         });
     }
 
     loadCommentaires();
-});
-document.querySelectorAll('.status-selector').forEach(selector => {
-    const hiddenInput = selector.closest('form').querySelector('#selectedStatus');
 
-    selector.querySelectorAll('.status-option').forEach(option => {
-        option.addEventListener('click', function() {
-            // Retirer "active" des autres
-            selector.querySelectorAll('.status-option').forEach(o => o.classList.remove('active'));
-            // Ajouter "active" à l'option cliquée
-            this.classList.add('active');
-            // Mettre à jour l'input caché
-            hiddenInput.value = this.dataset.value;
+    // ---------- DOCUMENTS COLLABORATEUR ----------
+    const userDocumentsList = document.getElementById('userDocumentsList');
+    const uploadForm = document.getElementById('uploadForm');
+    const parentSelect = document.getElementById('parentSelect');
+
+    async function loadUserDocuments() {
+        try {
+            const res = await fetch(`/collaborateur/taches/${tacheId}/documents`);
+            const data = await res.json();
+
+            if (!userDocumentsList) return;
+
+            if (data.success && Array.isArray(data.documents) && data.documents.length) {
+                const userDocuments = [];
+
+                data.documents.forEach(doc => {
+                    // Ajouter le document principal si c'est l'utilisateur
+                    if (doc.uploader_id === userId) {
+                        userDocuments.push({
+                            id: doc.id,
+                            nom_original: doc.nom_original,
+                            version: doc.version,
+                            uploader: doc.uploader,
+                            created_at: doc.created_at,
+                            url: doc.url,
+                            is_version: false
+                        });
+                    }
+
+                    // Ajouter toutes les versions
+                    if (Array.isArray(doc.versions)) {
+                        doc.versions.forEach(version => {
+                            if (version.uploader_id === userId) {
+                                userDocuments.push({
+                                    id: version.id,
+                                    nom_original: version.nom_original,
+                                    version: version.version,
+                                    uploader: version.uploader,
+                                    created_at: version.created_at,
+                                    url: version.url,
+                                    is_version: true,
+                                    parent_id: doc.id
+                                });
+                            }
+                        });
+                    }
+                });
+
+                if (userDocuments.length === 0) {
+                    userDocumentsList.innerHTML = '<li class="list-group-item text-muted">Aucun document soumis</li>';
+                    return;
+                }
+
+                // Affichage de tous les documents et versions
+                userDocumentsList.innerHTML = userDocuments.map(doc => `
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="d-flex flex-column">
+                            <a href="${doc.url}" target="_blank" class="text-decoration-none">
+                                <i class="fas fa-file-alt me-2"></i>${doc.nom_original}
+                                <span class="badge bg-secondary">v${doc.version}</span>
+                            </a>
+                            <small class="text-muted">
+                                Uploadé par ${doc.uploader} le ${doc.created_at}
+                            </small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger delete-doc" data-doc-id="${doc.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </li>
+                `).join('');
+
+            } else {
+                userDocumentsList.innerHTML = '<li class="list-group-item text-muted">Aucun document soumis</li>';
+            }
+
+            setupDocActions();
+
+        } catch(err) {
+            console.error('Erreur chargement documents:', err);
+            if(userDocumentsList) userDocumentsList.innerHTML = '<li class="list-group-item text-danger">Erreur lors du chargement des documents</li>';
+        }
+    }
+
+    async function loadParentOptions() {
+        try {
+            const res = await fetch(`/collaborateur/taches/${tacheId}/documents`);
+            const data = await res.json();
+
+            if (!parentSelect) return;
+
+            parentSelect.innerHTML = '<option value="">Nouveau document</option>';
+
+            if (data.success && Array.isArray(data.documents) && data.documents.length) {
+                data.documents.forEach(doc => {
+                    const mainOption = document.createElement('option');
+                    mainOption.value = doc.id;
+                    mainOption.textContent = `${doc.nom_original} (v${doc.version})`;
+                    parentSelect.appendChild(mainOption);
+
+                    if (Array.isArray(doc.versions)) {
+                        doc.versions.forEach(version => {
+                            const versionOption = document.createElement('option');
+                            versionOption.value = version.id;
+                            versionOption.textContent = `${version.nom_original} (v${version.version})`;
+                            parentSelect.appendChild(versionOption);
+                        });
+                    }
+                });
+            }
+        } catch(err) {
+            console.error('Erreur chargement options:', err);
+        }
+    }
+
+    function setupDocActions() {
+        if (!userDocumentsList) return;
+
+        userDocumentsList.querySelectorAll('.delete-doc').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const docId = btn.dataset.docId;
+                if (!confirm('Voulez-vous vraiment supprimer ce document ?')) return;
+
+                try {
+                    const response = await fetch(`/collaborateur/taches/${tacheId}/documents/${docId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        await loadUserDocuments();
+                        await loadParentOptions();
+                    } else {
+                        alert('Erreur lors de la suppression du document');
+                    }
+                } catch(err) {
+                    console.error('Erreur suppression document:', err);
+                    alert('Erreur lors de la suppression du document');
+                }
+            });
         });
-    });
+    }
+
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const formData = new FormData(uploadForm);
+
+            try {
+                const response = await fetch(`/collaborateur/taches/${tacheId}/documents`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    uploadForm.reset();
+                    await loadUserDocuments();
+                    await loadParentOptions();
+                    alert('Document uploadé avec succès!');
+                } else {
+                    alert(result.message || 'Erreur lors de l\'upload du document');
+                }
+            } catch(err) {
+                console.error('Erreur upload document:', err);
+                alert('Erreur lors de l\'upload du document');
+            }
+        });
+    }
+
+    loadUserDocuments();
+    loadParentOptions();
 });
-
-</script>
-
+</script> 
 @endsection

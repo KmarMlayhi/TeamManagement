@@ -18,9 +18,11 @@
     <div class="sidebar" id="sidebar">
          <!-- Logo et Titres dans la sidebar -->
         <div class="logo-sidebar-container text-center py-3">
+            <a href="{{ route('collaborateur.home') }}">
             <img src="{{ asset('images/logo_tunis.png') }}"
                  alt="Drapeau Tunisien"
                  class="logo-sidebar mb-2">
+            </a>
             <h4 class="text-white mb-1">République Tunisienne</h4>
             <p class="text-white-50 small mb-0">Ministère de l'équipement et de l'habitat</p>
         </div>
@@ -66,7 +68,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         <li>
-                            <a class="dropdown-item" href="{{ route('collaborateur.profil') }}">
+                            <a class="dropdown-item" href="{{ route('profil.show') }}">
                                 <i class="fas fa-user me-2"></i> Profil
                             </a>
                         </li>

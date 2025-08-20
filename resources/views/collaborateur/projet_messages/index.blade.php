@@ -70,7 +70,7 @@
 @endsection
 @section('content')
 <div class="main-content">
-     <div class="breadcrumb-container">
+    <div class="breadcrumb-container">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('collaborateur.home') }}"><i class="fas fa-home"></i></a></li>

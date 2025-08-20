@@ -208,7 +208,7 @@ public function details(Projet $projet)
         'budget' => $projet->budget,
         'statut_text' => $projet->statut_text,
         'statut_class' => $projet->statut === 'termine' ? 'success' : ($projet->statut === 'en_cours' ? 'primary' : 'warning'),
-        'progression' => $projet->progression,
+        'progression' => $projet->avancement,
 
         'equipes' => $projet->equipes->map(function ($equipe) {
             return [

@@ -90,18 +90,23 @@
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="assignee-info">
-                                        @if($tache->affecteA)
-                                        <img src="{{ $tache->affecteA->photo_url ?? asset('images/default-avatar.png') }}" 
-                                             alt="{{ $tache->affecteA->name }}" 
-                                             class="rounded-circle me-1" 
-                                             width="24" 
-                                             height="24"
-                                             title="{{ $tache->affecteA->name }}">
+                                        @if($tache->users->count())
+                                            <ul class="list-unstyled mb-0">
+                                                @foreach($tache->users as $user)
+                                                    <li class="d-flex align-items-center mb-1">
+                                                        <img src="{{ asset('storage/' . $user->avatar) }}" 
+                                                            alt="{{ $user->name }}" 
+                                                            class="rounded-circle me-2"
+                                                            width="40" height="40">
+                                                        <span class="small">{{ $user->name }}</span>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
                                         @else
-                                        <span class="text-muted small">Non assigné</span>
+                                            <span class="text-muted small">Non assigné</span>
                                         @endif
                                     </div>
-                                    
+
                                     <div class="task-meta">
                                         <span class="badge bg-light text-dark">
                                             <i class="far fa-calendar-alt me-1"></i>

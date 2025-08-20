@@ -4,6 +4,20 @@
 
 @section('content')
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style> 
+.breadcrumb-container {
+    background-color: white;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+}
+
+.breadcrumb {
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+}
+</style>
 
 <!-- Breadcrumb -->
 <div class="breadcrumb-container mb-4">

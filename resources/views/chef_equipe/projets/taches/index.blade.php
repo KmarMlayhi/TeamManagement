@@ -43,7 +43,7 @@
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show">
                     <i class="fas fa-check-circle me-1"></i>{{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'"></button>
                 </div>
             @endif
 
@@ -83,9 +83,6 @@
                                         <div class="d-flex flex-column">
                                             @foreach($tache->users as $user)
                                                 <div class="d-flex align-items-center mb-1">
-                                                    <div class="avatar-sm me-2">
-                                                        {{ substr($user->name, 0, 1) }}
-                                                    </div>
                                                     <div>
                                                         <div class="fw-medium">{{ $user->name }}</div>
                                                         <small class="text-muted">{{ $user->fonction?->nom ?? 'Non spécifié' }}</small>
@@ -97,21 +94,10 @@
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
-
                                 <td>
-                                    @if($tache->taskdocuments->isNotEmpty())
-                                        <ul class="list-unstyled mb-0">
-                                            @foreach($tache->taskdocuments as $doc)
-                                                <li>
-                                                    <a href="{{ asset('storage/' . $doc->chemin) }}" target="_blank">
-                                                        <i class="fas fa-file-alt me-1"></i>{{ $doc->nom_original }}
-                                                    </a>
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    @else
-                                        <span class="text-muted">-</span>
-                                    @endif
+                                    <button class="btn btn-sm btn-outline-primary" onclick="openModal({{ $tache->id }})">
+                                        <i class="fas fa-file-alt me-1"></i> Documents
+                                    </button>
                                 </td>
                                 <td>
                                     <div class="d-flex flex-column">
@@ -166,38 +152,151 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Modales Documents Custom -->
+                @foreach($taches as $tache)
+                <div id="documentsModal{{ $tache->id }}" class="custom-modal">
+                    <div class="custom-modal-content">
+                        <div class="custom-modal-header">
+                            <h5>Documents - {{ $tache->titre }}</h5>
+                            <span class="custom-modal-close" onclick="closeModal({{ $tache->id }})">&times;</span>
+                        </div>
+                        <div class="custom-modal-body">
+                            <ul class="list-group mb-3">
+                                @php
+                                    $parents = $tache->taskdocuments->whereNull('parent_id');
+                                @endphp
+
+                                @foreach($parents as $parent)
+                                    <li class="list-group-item">
+                                        <strong>{{ $parent->nom_original }}</strong>
+                                        @php
+                                            $versions = $tache->taskdocuments->where('parent_id', $parent->id)->sortBy('version');
+                                        @endphp
+                                        {{-- Afficher V1 (le parent lui-même) --}}
+                                        <div class="d-flex justify-content-between align-items-center mt-1">
+                                            <span>v1 - {{ $parent->uploader?->name ?? 'Inconnu' }} - {{ $parent->created_at->format('d/m/Y H:i') }}</span>
+                                            <a href="{{ asset('storage/' . $parent->chemin) }}" target="_blank" class="btn btn-sm btn-outline-primary">Télécharger</a>
+                                        </div>
+
+                                        {{-- Afficher les autres versions si elles existent --}}
+                                        @foreach($versions as $doc)
+                                            <div class="d-flex justify-content-between align-items-center mt-1 ms-3">
+                                                <span>v{{ $doc->version }} - {{ $doc->uploader?->name ?? 'Inconnu' }} - <strong>{{ $doc->nom_original }}</strong> -
+                                                         {{ $doc->created_at->format('d/m/Y H:i') }}</span>
+                                                <a href="{{ asset('storage/' . $doc->chemin) }}" target="_blank" class="btn btn-sm btn-outline-primary">Télécharger</a>
+                                            </div>
+                                        @endforeach
+                                    </li>
+                                @endforeach
+                            </ul>
+
+
+                            <form action="{{ route('chef_equipe.projets.taches.uploadDocument', [$projet, $tache]) }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <div class="mb-3">
+                                    <label for="document" class="form-label">Ajouter / Mettre à jour un document</label>
+                                    <input type="file" name="document" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="parent_id" class="form-label">Parent (laisser vide si nouveau document)</label>
+                                    <select name="parent_id" class="form-select">
+                                        <option value="">Nouveau document</option>
+                                        @foreach($tache->taskdocuments->whereNull('parent_id') as $doc)
+                                            <option value="{{ $doc->id }}">{{ $doc->nom_original }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-success">Ajouter</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+
             @endif
         </div>
     </div>
 </div>
+
+<!-- Styles modales custom -->
+<style>
+.custom-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.custom-modal-content {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 5px;
+    max-width: 800px;
+    width: 90%;
+}
+
+.custom-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+   padding: 1rem;
+   color: var(--secondary-color);
+}
+
+.custom-modal-close {
+    cursor: pointer;
+    font-size: 1.5rem;
+}
+
+.custom-modal-body {
+  padding: 1rem;
+  background-color: var(--light-color);
+}
+</style>
+
 @endsection
 
 @section('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
 
 <script>
 $(function() {
+    // Table triable
     $("#sortable").sortable({
         handle: ".handle",
         opacity: 0.7,
         helper: "clone",
         update: function(event, ui) {
             const tacheIds = $(this).sortable('toArray', { attribute: 'data-id' });
-            
             $.post("{{ route('chef_equipe.projets.taches.reorder', $projet) }}", {
                 _token: "{{ csrf_token() }}",
                 taches: tacheIds
             });
         }
     }).disableSelection();
-    
-    // Tooltips
-    $('[title]').tooltip({
-        placement: 'top',
-        trigger: 'hover'
-    });
 });
+
+// Fonctions modales custom
+function openModal(id){
+    document.getElementById('documentsModal'+id).style.display = 'flex';
+}
+function closeModal(id){
+    document.getElementById('documentsModal'+id).style.display = 'none';
+}
+window.onclick = function(event) {
+    document.querySelectorAll('.custom-modal').forEach(function(modal){
+        if(event.target == modal){
+            modal.style.display = 'none';
+        }
+    });
+}
 </script>
 @endsection

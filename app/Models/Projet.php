@@ -70,5 +70,22 @@ class Projet extends Model
         return $this->hasMany(ProjectMessage::class);
     }
 
+    public function calculerAvancement()
+    {
+        $total = $this->taches()->count();
+        if ($total === 0) {
+            return 0;
+        }
+
+        $terminees = $this->taches()->where('statut', 'termine')->count();
+
+        return round(($terminees / $total) * 100, 2);
+    }
+
+    public function mettreAJourAvancement()
+    {
+        $this->avancement = $this->calculerAvancement();
+        $this->save();
+    }
 
 }

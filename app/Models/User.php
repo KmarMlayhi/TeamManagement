@@ -84,4 +84,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Commentaire::class, 'destinataire_id');
     }
+    public function taches()
+    {
+        return $this->belongsToMany(\App\Models\Tache::class, 'tache_user')->withTimestamps();
+    }
+
 }
