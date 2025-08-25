@@ -14,12 +14,12 @@
 
 <div class="auth-container">
     <!-- Sidebar avec logos -->
-    <div class="sidebar">
+   <div class="sidebar">
         <div class="logo-sidebar-container text-center py-3">
             <img src="{{ asset('images/logo_tunis.png') }}"
                  alt="Drapeau Tunisien"
                  class="logo-sidebar mb-3">
-            <h4 class="text-white mb-2">République Tunisienne</h4>
+            <h4 class="text-white mb-2  ">République Tunisienne</h4>
             <p class="text-white-50 small mb-1">Ministère de l'équipement et de l'habitat</p>
             <img src="{{ asset('images/logo_mehat.png') }}" 
                  alt="Logo du Ministère" 
@@ -30,7 +30,8 @@
     <!-- Contenu du formulaire -->
     <div class="auth-content">
         <div class="auth-header text-center">
-            <h2 class="mb-2"><i class="fas fa-user-shield me-2"></i>Création de compte utilisateur</h2>
+            <h1 class="platform-title">Team Management Platform</h1>
+            <h3 class="mb-1"><i class="fas fa-user-shield me-2"></i>Création de compte utilisateur</h3>
             <p class="mb-0">Accès au portail administratif</p>
         </div>
         
@@ -172,6 +173,10 @@
                 <p class="mb-0">Déjà un compte? <a href="{{ url('/login') }}" class="text-decoration-none">Se connecter</a></p>
             </div>
         </form>
+        <div class="credits">
+            <p class="mb-0">Réalisé par Kmar Mlayhi</p>
+            <p class="mb-0">Encadré par Mr. Hyathem Saad</p>
+        </div>
     </div>
 </div>
 

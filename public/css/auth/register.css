@@ -120,3 +120,34 @@
         .row {
             margin-bottom: 0.5rem;
         }
+
+         .platform-title {
+            color: #0056b3;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        .credits {
+            margin-top: 1rem;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+        
+        @media (max-width: 992px) {
+            .auth-container {
+                flex-direction: column;
+            }
+            
+            .sidebar, .auth-content {
+                width: 100%;
+            }
+            
+            .sidebar {
+                padding: 2rem 1rem;
+            }
+            
+            .auth-content {
+                padding: 2rem 1.5rem;
+            }
+        }

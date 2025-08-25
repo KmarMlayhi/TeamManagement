@@ -110,7 +110,7 @@
     @csrf
         <div class="input-group mb-3">
             <input type="text" name="message" class="form-control" placeholder="Écrire un message...">
-            <input type="file" name="fichier" class="form-control" style="max-width: 200px;">
+            <input type="file" name="fichier" class="form-control" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx">
             <button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i> Envoyer</button>
         </div>
         @error('message')

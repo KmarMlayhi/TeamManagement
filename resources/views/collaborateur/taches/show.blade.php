@@ -310,8 +310,8 @@
                                 @endforeach
                             </ul> <br>
                         <div class="alert alert-warning mb-3" role="alert" style="font-size: 0.9rem;">
-                            ⚠️ Les documents partagés ici concernent uniquement une  tâche spécifique pas toute l'équipe.  <br>
-                            ⚠️ Pour partager des documents avec tous vos collaborateurs, merci de rejoindre la discussion générale du projet. 
+                            ⚠️ Les documents partagés ici concernent uniquement une tâche spécifique pas toute l'équipe.  <br>
+                            ⚠️ Pour partager des documents avec tous les collaborateurs de ce projet, merci de rejoindre la discussion générale du projet. 
                         </div>
                         @endif
                         </div>

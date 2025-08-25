@@ -118,7 +118,7 @@ $(document).ready(function () {
                         </div>
                     </div>
                     <div class="alert alert-warning mb-3" role="alert" style="font-size: 0.9rem;">
-                        ⚠️ Pour partager des documents avec tous vos collaborateurs, merci de rejoindre la discussion générale.
+                        ⚠️ Pour partager des documents avec tous les collaborateurs de ce projet, merci de rejoindre la discussion générale.
                     </div>
                     <h5 class="section-title">Documents importants </h5>
                     

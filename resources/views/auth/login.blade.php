@@ -26,11 +26,11 @@
                  class="ministere-logo">
         </div>
     </div>
-    
     <!-- Contenu du formulaire -->
     <div class="auth-content">
         <div class="auth-header text-center">
-            <h2 class="mb-2"><i class="fas fa-lock me-2"></i>Accès sécurisé</h2>
+            <h1 class="platform-title">Team Management Platform</h1>
+            <h3 class="mb-2"><i class="fas fa-lock me-2"></i>Accès sécurisé</h3>
             <p class="mb-0">Portail administratif</p>
         </div>
         
@@ -94,6 +94,11 @@
                 <p class="mb-0">Première visite ? <a href="{{ url('/register') }}" class="text-decoration-none">Créer un compte</a></p>
             </div>
         </form>
+
+        <div class="credits">
+            <p class="mb-0">Réalisé par Kmar Mlayhi</p>
+            <p class="mb-0">Encadré par Mr. Hyathem Saad</p>
+        </div>
     </div>
 </div>
 

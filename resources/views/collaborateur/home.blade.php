@@ -220,7 +220,7 @@
             <div class="card-body">
                 <ul class="list-group">
                     @forelse($projetsRecents as $projet)
-                        <a href="{{ route('collaborateur.projets.show', $projet) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <a href="{{ route('collaborateur.equipes.index') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                             <div class="fw-bold">{{ $projet->nom }}</div>
                             <div class="project-status">
                                 <span class="badge bg-{{ $projet->statut_color }} rounded-pill">
