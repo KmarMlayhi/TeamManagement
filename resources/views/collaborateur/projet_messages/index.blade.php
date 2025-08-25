@@ -74,7 +74,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('collaborateur.home') }}"><i class="fas fa-home"></i></a></li>
-                <li class="breadcrumb-item"><a href="{{ route('projet_messages.projet_list') }}">Projets</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('projet_messages.projet_list') }}"> Projets</a></li>
                 <li class="breadcrumb-item active">{{ $projet->nom }}</li>
             </ol>
         </nav>
