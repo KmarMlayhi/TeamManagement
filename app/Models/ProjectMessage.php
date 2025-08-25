@@ -12,8 +12,11 @@ class ProjectMessage extends Model
     protected $fillable = [
         'projet_id',
         'user_id',
-        'message'
+        'message',
+        'fichier',
+        'fichier_original'
     ];
+
 public function user()
 {
     return $this->belongsTo(User::class);

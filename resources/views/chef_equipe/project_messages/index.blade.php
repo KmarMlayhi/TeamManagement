@@ -86,36 +86,41 @@
 
     <div id="chatBox" class="mb-3">
         @forelse($messages as $msg)
-            @if($msg->user_id == auth()->id())
-                <div class="d-flex mb-2 justify-content-end">
-                    <div class="message-bubble message-sent">
-                        <small>{{ $msg->user->name }} • {{ $msg->created_at->format('H:i') }}</small>
-                        {{ $msg->message }}
-                    </div>
+            <div class="d-flex mb-2 {{ $msg->user_id == auth()->id() ? 'justify-content-end' : 'justify-content-start' }}">
+                <div class="message-bubble {{ $msg->user_id == auth()->id() ? 'message-sent' : 'message-received' }}">
+                    <small>{{ $msg->user->name }} • {{ $msg->created_at->format('H:i') }}</small>
+                    <p>{{ $msg->message }}</p>
+                    
+                    @if($msg->fichier)
+                       <p class="mt-2">
+                             <a href="{{ asset('storage/' . $msg->fichier) }}" target="_blank">
+                                 <i class="fas fa-file-alt me-1"></i> {{ $msg->fichier_original }}
+                            </a>
+                        </p>
+                    @endif
                 </div>
-            @else
-                <div class="d-flex mb-2 justify-content-start">
-                    <div class="message-bubble message-received">
-                        <small>{{ $msg->user->name }} • {{ $msg->created_at->format('H:i') }}</small>
-                        {{ $msg->message }}
-                    </div>
-                </div>
-            @endif
+            </div>
         @empty
             <p class="text-center text-muted mt-3">Aucun message pour le moment.</p>
         @endforelse
+
     </div>
 
-    <form action="{{ route('chef_equipe.project_messages.store', $projet->id) }}" method="POST" id="chatForm">
-        @csrf
+    <form action="{{ route('chef_equipe.project_messages.store', $projet->id) }}" method="POST" id="chatForm" enctype="multipart/form-data">
+    @csrf
         <div class="input-group mb-3">
-            <input type="text" name="message" class="form-control" placeholder="Écrire un message..." required>
+            <input type="text" name="message" class="form-control" placeholder="Écrire un message...">
+            <input type="file" name="fichier" class="form-control" style="max-width: 200px;">
             <button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i> Envoyer</button>
         </div>
         @error('message')
             <p class="text-danger mt-1">{{ $message }}</p>
         @enderror
+        @error('fichier')
+            <p class="text-danger mt-1">{{ $message }}</p>
+        @enderror
     </form>
+
 </div>
 
 

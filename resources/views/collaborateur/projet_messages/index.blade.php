@@ -96,7 +96,20 @@
                         </strong> • 
                         <span class="text-muted">{{ $msg->created_at->format('H:i') }}</span>
                     </small>
-                    <p class="mb-0">{{ $msg->message }}</p>
+
+                    {{-- Texte --}}
+                    @if($msg->message)
+                        <p class="mb-0">{{ $msg->message }}</p>
+                    @endif
+
+                    {{-- Fichier --}}
+                    @if($msg->fichier)
+                      <p class="mt-2">
+                        <a href="{{ asset('storage/' . $msg->fichier) }}" target="_blank">
+                            <i class="fas fa-file-alt me-1"></i> {{ $msg->fichier_original }}
+                        </a>
+                    </p>
+                    @endif
                 </div>
             </div>
         @empty
@@ -104,15 +117,13 @@
         @endforelse
     </div>
 
-    <form action="{{ route('projet_messages.store', $projet->id) }}" method="POST" id="chatForm">
-        @csrf
+    <form action="{{ route('projet_messages.store', $projet->id) }}" method="POST" id="chatForm" enctype="multipart/form-data">
+    @csrf
         <div class="input-group mb-3">
-            <input type="text" name="message" class="form-control" placeholder="Écrire un message..." required>
+            <input type="text" name="message" class="form-control" placeholder="Écrire un message...">
+            <input type="file" name="fichier" class="form-control" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx">
             <button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i> Envoyer</button>
         </div>
-        @error('message')
-            <p class="text-danger mt-1">{{ $message }}</p>
-        @enderror
     </form>
 
 </div>

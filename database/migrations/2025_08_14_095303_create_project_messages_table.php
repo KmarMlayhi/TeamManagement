@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('projet_id')->constrained('projets')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->text('message');
+            $table->text('message')->nullable(); // ✅ texte optionnel
             $table->timestamps();
         });
     }

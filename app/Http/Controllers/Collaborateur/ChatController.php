@@ -51,31 +51,52 @@ class ChatController extends Controller
     }
 
     // Ajouter un message
+
     public function storeMessage(Request $request, Projet $projet)
-    {
-        $request->validate([
-            'message' => 'required|string|max:1000'
-        ]);
+{
+    $request->validate([
+        'message' => 'nullable|string|max:1000',
+        'fichier' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,ppt,pptx,xls,xlsx|max:20480' // 20 Mo
+    ]);
 
-        $user = Auth::user();
+    $user = Auth::user();
 
-        $userIds = $projet->equipes()->with('utilisateurs')->get()
-                           ->pluck('utilisateurs.*.id')
-                           ->flatten()
-                           ->unique();
+    // Vérifie que l'utilisateur appartient bien au projet
+    $userIds = $projet->equipes()->with('utilisateurs')->get()
+                       ->pluck('utilisateurs.*.id')
+                       ->flatten()
+                       ->unique();
 
-        if (!$userIds->contains($user->id)) {
-            abort(403, "Vous n'êtes pas affecté à ce projet");
-        }
-
-        ProjectMessage::create([
-            'projet_id' => $projet->id,
-            'user_id' => $user->id,
-            'message' => $request->message
-        ]);
-
-        return redirect()->back();
+    if (!$userIds->contains($user->id)) {
+        abort(403, "Vous n'êtes pas affecté à ce projet");
     }
+
+    // Gestion de l'upload du fichier (si présent)
+    $fichierPath = null;
+    $fichierOriginal = null;
+    if ($request->hasFile('fichier')) {
+        // Stocke dans storage/app/public/messages_fichiers
+        $fichierPath = $request->file('fichier')->store('messages_fichiers', 'public');
+        $fichierOriginal = $request->file('fichier')->getClientOriginalName();
+    }
+
+    // Empêcher l'envoi d'un message complètement vide
+    if (empty($request->message) && !$fichierPath) {
+        return back()->withErrors(['message' => 'Vous devez écrire un message ou envoyer un fichier.']);
+    }
+
+    // Sauvegarde du message
+    ProjectMessage::create([
+        'projet_id'        => $projet->id,
+        'user_id'          => $user->id,
+        'message'          => $request->message,
+        'fichier'          => $fichierPath,
+        'fichier_original' => $fichierOriginal
+    ]);
+
+    return redirect()->back();
+}
+
 
     public function projectUsers(Projet $projet)
 {

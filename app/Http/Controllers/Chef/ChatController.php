@@ -49,32 +49,50 @@ class ChatController extends Controller
 
     }
 
-    // Ajouter un message
-    public function storeMessage(Request $request, Projet $projet)
-    {
-        $request->validate([
-            'message' => 'required|string|max:1000'
-        ]);
+public function storeMessage(Request $request, Projet $projet)
+{
+    // Validation
+    $request->validate([
+        'message' => 'nullable|string|max:1000',
+        'fichier' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,ppt,pptx,xls,xlsx|max:20480' // 20 Mo
+    ]);
 
-        $user = Auth::user();
+    $user = Auth::user();
 
-        $userIds = $projet->equipes()->with('utilisateurs')->get()
-                           ->pluck('utilisateurs.*.id')
-                           ->flatten()
-                           ->unique();
+    // Vérifie que l'utilisateur appartient au projet
+    $userIds = $projet->equipes()->with('utilisateurs')->get()
+                       ->pluck('utilisateurs.*.id')
+                       ->flatten()
+                       ->unique();
 
-        if (!$userIds->contains($user->id)) {
-            abort(403, "Vous n'êtes pas affecté à ce projet");
-        }
-
-        ProjectMessage::create([
-            'projet_id' => $projet->id,
-            'user_id' => $user->id,
-            'message' => $request->message
-        ]);
-
-        return redirect()->back();
+    if (!$userIds->contains($user->id)) {
+        abort(403, "Vous n'êtes pas affecté à ce projet");
     }
+
+    // Empêcher un message totalement vide
+    if (empty($request->message) && !$request->hasFile('fichier')) {
+        return back()->withErrors(['message' => 'Vous devez écrire un message ou envoyer un fichier.']);
+    }
+
+    $data = [
+        'projet_id' => $projet->id,
+        'user_id'   => $user->id,
+        'message'   => $request->message,
+    ];
+
+    // Gestion du fichier
+    if ($request->hasFile('fichier')) {
+        $file = $request->file('fichier');
+        $data['fichier'] = $file->store('messages_fichiers', 'public'); // chemin pour asset('storage/...') 
+        $data['fichier_original'] = $file->getClientOriginalName();     // nom original du fichier
+    }
+
+    ProjectMessage::create($data);
+
+    return redirect()->back();
+}
+
+
     public function projectUsers(Projet $projet)
 {
     try {
