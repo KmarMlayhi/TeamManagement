@@ -64,7 +64,6 @@ class EquipeController extends Controller
         'user_ids.*' => 'exists:users,id'
     ]);
 
-    // TOUJOURS ajouter created_by si l'utilisateur est connecté
     $validated['created_by'] = Auth::id();
 
     $equipe = Equipe::create($validated);

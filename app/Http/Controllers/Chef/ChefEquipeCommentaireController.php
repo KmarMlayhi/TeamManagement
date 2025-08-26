@@ -37,9 +37,6 @@ class ChefEquipeCommentaireController extends Controller
                 ->paginate(6)
                 ->withQueryString();
         }
-
-       
-
         return view('chef_equipe.commentaires.index', compact('projets', 'selectedProjet', 'commentaires'));
     }
 
@@ -61,7 +58,7 @@ class ChefEquipeCommentaireController extends Controller
         'auteur_id' => $chef->id,
         'destinataire_id' => $commentaire->auteur_id,
         'contenu' => $request->contenu,
-        'parent_id' => $commentaire->id, // <-- important
+        'parent_id' => $commentaire->id, 
     ]);
 
     $reponse->load('auteur:id,name');
@@ -89,48 +86,48 @@ class ChefEquipeCommentaireController extends Controller
 
         return response()->json(['success' => true]);
     }
-    // Dans ChefEquipeCommentaireController
 
-// 1️⃣ Méthode pour récupérer le commentaire à éditer
-public function edit(Commentaire $commentaire)
-{
-    $chef = Auth::user();
+// Méthode pour récupérer le commentaire à éditer
 
-    if ($chef->role->name !== 'chef_equipe' || $chef->id !== $commentaire->auteur_id) {
-        abort(403, 'Non autorisé');
-    }
+    public function edit(Commentaire $commentaire)
+    {
+        $chef = Auth::user();
 
-    // Retourne le commentaire pour affichage dans un formulaire ou modal
-    return response()->json([
-        'id' => $commentaire->id,
-        'contenu' => $commentaire->contenu,
-    ]);
-}
+        if ($chef->role->name !== 'chef_equipe' || $chef->id !== $commentaire->auteur_id) {
+            abort(403, 'Non autorisé');
+        }
 
-// 2️⃣ Méthode pour mettre à jour le commentaire
-public function update(Request $request, Commentaire $commentaire)
-{
-    $chef = Auth::user();
-
-    if ($chef->role->name !== 'chef_equipe' || $chef->id !== $commentaire->auteur_id) {
-        return response()->json(['error' => 'Non autorisé'], 403);
-    }
-
-    $request->validate([
-        'contenu' => 'required|string|max:1000',
-    ]);
-
-    $commentaire->contenu = $request->contenu;
-    $commentaire->save();
-
-    return response()->json([
-        'success' => true,
-        'commentaire' => [
+        return response()->json([
             'id' => $commentaire->id,
             'contenu' => $commentaire->contenu,
-            'updated_at_humans' => $commentaire->updated_at->diffForHumans(),
-        ]
-    ]);
-}
+        ]);
+    }
+
+//  Méthode pour mettre à jour le commentaire
+
+    public function update(Request $request, Commentaire $commentaire)
+    {
+        $chef = Auth::user();
+
+        if ($chef->role->name !== 'chef_equipe' || $chef->id !== $commentaire->auteur_id) {
+            return response()->json(['error' => 'Non autorisé'], 403);
+        }
+
+        $request->validate([
+            'contenu' => 'required|string|max:1000',
+        ]);
+
+        $commentaire->contenu = $request->contenu;
+        $commentaire->save();
+
+        return response()->json([
+            'success' => true,
+            'commentaire' => [
+                'id' => $commentaire->id,
+                'contenu' => $commentaire->contenu,
+                'updated_at_humans' => $commentaire->updated_at->diffForHumans(),
+            ]
+        ]);
+    }
 
 }

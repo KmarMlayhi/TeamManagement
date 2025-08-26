@@ -16,7 +16,6 @@
 <body>
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-         <!-- Logo et Titres dans la sidebar -->
         <div class="logo-sidebar-container text-center py-3">
             <a href="{{ route('collaborateur.home') }}">
             <img src="{{ asset('images/logo_tunis.png') }}"
@@ -57,6 +56,9 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand navbar-light">
        <div class="container-fluid"> 
+            <span class="navbar-brand  text-primary mb-1">
+                Team Management Plateform
+            </span>
             <button id="sidebarToggle" class="btn d-md-none">
                 <i class="fas fa-bars"></i>
             </button>

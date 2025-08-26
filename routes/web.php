@@ -82,7 +82,6 @@ Route::middleware(['auth', 'isChefEquipe'])
         Route::delete('/{projet}', [ProjetController::class, 'destroy'])->name('destroy');
         Route::get('/{projet}/reunion', [MeetingController::class, 'createMeeting'])
         ->name('reunion');
-
          Route::prefix('{projet}/taches')->name('taches.')->group(function () {
             Route::get('/', [TacheController::class, 'index'])->name('index');
             Route::get('/create', [TacheController::class, 'create'])->name('create');
@@ -99,17 +98,15 @@ Route::middleware(['auth', 'isChefEquipe'])
             Route::post('/update-status', [TacheController::class, 'updateStatus'])->name('update-status');
             Route::post('/reorder', [TacheController::class, 'reorder'])->name('reorder');
         });
-    
+        Route::delete('documents/{document}', [ProjetController::class, 'destroyDocument'])
+                ->name('documentsproject.destroy');
     });
 
-    // Route::get('/reunion/create', [MeetingController::class, 'createMeeting'])
-    //         ->name('reunion.create');
-
+    
 
     // Gestion des documents d'une tâche
-            Route::delete('/documents/{taskdocument}', [TacheController::class, 'destroyDocument'])->name('documents.destroy');
-    Route::delete('documents/{document}', [ProjetController::class, 'destroyDocument'])
-                ->name('documents.destroy');
+    Route::delete('/documents/{taskdocument}', [TacheController::class, 'destroyDocument'])->name('documents.destroy');
+    
 
     Route::get('/commentaires', [ChefEquipeCommentaireController::class, 'index'])
         ->name('commentaires');

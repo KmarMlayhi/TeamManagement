@@ -15,9 +15,8 @@ class TacheController extends Controller
 {
     public function index(Projet $projet)
     {
-        // Charger les tâches avec les relations nécessaires
         $taches = $projet->taches()
-            ->with(['users.fonction', 'users.role', 'taskdocuments']) // relations chargées
+            ->with(['users.fonction', 'users.role', 'taskdocuments']) 
             ->when(Schema::hasColumn('taches', 'ordre'), function($query) {
                 $query->orderBy('ordre');
             }, function($query) {
@@ -47,7 +46,7 @@ class TacheController extends Controller
             'users' => $users,
             'priorites' => Tache::PRIORITES,
             'statuts' => Tache::STATUTS,
-            'tache' => null, // ✅ ajoute ceci pour éviter l'erreur
+            'tache' => null, 
         ]);
     }
 
@@ -72,10 +71,10 @@ class TacheController extends Controller
         $tache->ordre = $projet->taches()->max('ordre') + 1;
         $tache->save();
 
-        // ✅ plusieurs utilisateurs
+       
         $tache->users()->sync($validated['users']);
 
-        // ✅ upload documents avec Taskdocument
+        // upload documents 
         if ($request->hasFile('taskdocuments')) {
             foreach ($request->file('taskdocuments') as $file) {
                 $path = $file->store('documents/taches/' . $tache->id, 'public');
@@ -89,7 +88,6 @@ class TacheController extends Controller
                 ]);
             }
         }
-
 
         return redirect()->route('chef_equipe.projets.taches.index', $projet)
             ->with('success', 'Tâche créée avec succès.');
@@ -128,10 +126,10 @@ class TacheController extends Controller
 
         $tache->update($validated);
 
-        // ✅ update users
+        // update users
         $tache->users()->sync($validated['users']);
 
-        // ✅ upload docs
+        // upload docs
         if ($request->hasFile('new_documents')) {
             foreach ($request->file('new_documents') as $file) {
                 $path = $file->store('documents/taches/' . $tache->id, 'public');
@@ -182,7 +180,7 @@ class TacheController extends Controller
 
     public function destroy(Projet $projet, Tache $tache)
     {
-        // ✅ supprimer les documents physiques
+        // supprimer les documents physiques
         foreach ($tache->taskdocuments as $doc) {
             Storage::disk('public')->delete($doc->chemin);
             $doc->delete();
@@ -234,7 +232,6 @@ class TacheController extends Controller
 
 public function kanban(Projet $projet)
 {
-    // Supprimez ->toArray() pour garder les objets Eloquent
     $tachesGrouped = $projet->taches()
                           ->get()
                           ->groupBy('statut');

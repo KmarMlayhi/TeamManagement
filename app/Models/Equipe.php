@@ -43,7 +43,7 @@ class Equipe extends Model
         foreach ($this->children as $child) {
             $child->niveau = $this->niveau + 1;
             $child->save();
-            $child->updateChildrenNiveau(); // Récursivité
+            $child->updateChildrenNiveau(); 
         }
     }
 

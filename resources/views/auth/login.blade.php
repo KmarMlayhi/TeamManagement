@@ -13,7 +13,6 @@
 <body>
 
 <div class="auth-container">
-    <!-- Sidebar avec logos -->
     <div class="sidebar">
         <div class="logo-sidebar-container text-center py-3">
             <img src="{{ asset('images/logo_tunis.png') }}"

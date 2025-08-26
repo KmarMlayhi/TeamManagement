@@ -102,7 +102,7 @@
                         </select>
                     </div>
                     <!-- Section Documents -->
-            <div class="col-12 mb-4">
+                <div class="col-12 mb-4">
                 <label class="form-label">Documents</label>
                 
                 <!-- Liste des documents existants -->
@@ -134,8 +134,7 @@
                                 onclick="document.getElementById('new_documents').click()">
                             <i class="fas fa-folder-open me-1"></i> Choisir des fichiers
                         </button>
-                        {{-- <input type="text" class="form-control" id="file-list" 
-                            placeholder="Aucun fichier sélectionné" readonly> --}}
+                       
                     </div>
                     <small class="text-muted">Formats acceptés: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (max 10MB chacun)</small>
                 </div>
@@ -184,9 +183,9 @@ $(document).ready(function() {
     // Gestion de la suppression des documents
     $(document).on('click', '.delete-document', function() {
         const documentId = $(this).data('document-id');
-        if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer ce document kmayra ?')) {
             $.ajax({
-                url: `/chef-equipe/documents/${documentId}`,
+                url: "{{ route('chef_equipe.projets.documentsproject.destroy', ':id') }}".replace(':id', documentId),
                 type: 'DELETE',
                 data: {
                     _token: "{{ csrf_token() }}"

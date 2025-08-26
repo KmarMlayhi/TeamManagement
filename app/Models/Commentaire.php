@@ -15,7 +15,7 @@ class Commentaire extends Model
         'tache_id',
         'projet_id',
         'contenu',
-        'parent_id', // <-- ajouter ici
+        'parent_id', 
         'edited_at',
     ];
 

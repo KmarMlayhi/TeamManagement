@@ -86,7 +86,7 @@
                     </div>
 
                     <!-- Équipe -->
-                    <!-- Équipe responsable (plusieurs équipes possibles) -->
+                    
                     <div class="col-12 mb-4">
                         <label for="equipe_ids" class="form-label ">Équipes responsables</label>
                         <select class="form-select @error('equipe_ids') is-invalid @enderror" 

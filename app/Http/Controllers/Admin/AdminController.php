@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class AdminController extends Controller
 {
     /**
-     * Méthode privée pour calculer les stats utilisateurs
+     * Méthode pour calculer les stats utilisateurs
      */
     private function getUserStats()
     {

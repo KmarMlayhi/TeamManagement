@@ -14,7 +14,7 @@ class TacheCommentaireController extends Controller
     {
         $user = Auth::user();
 
-        // ✅ Vérification des permissions : créateur ou utilisateur assigné
+        
         if ($user->id !== $tache->created_by && !$tache->users->contains($user)) {
             return response()->json(['error' => 'Non autorisé'], 403);
         }
@@ -40,7 +40,6 @@ class TacheCommentaireController extends Controller
 
         $user = Auth::user();
 
-        // ✅ Vérification des permissions : créateur ou utilisateur assigné
         if ($user->id !== $tache->created_by && !$tache->users->contains($user)) {
             return response()->json(['error' => 'Non autorisé'], 403);
         }
@@ -64,7 +63,7 @@ class TacheCommentaireController extends Controller
             ->where('tache_id', $tacheId)
             ->firstOrFail();
 
-        // ✅ Vérification : seul l'auteur du commentaire peut le modifier
+        // Vérification : seul l'auteur du commentaire peut le modifier
         if ($user->id !== $commentaire->auteur_id) {
             return response()->json(['error' => 'Non autorisé'], 403);
         }
@@ -90,7 +89,7 @@ class TacheCommentaireController extends Controller
             ->where('tache_id', $tacheId)
             ->firstOrFail();
 
-        // ✅ Vérification : auteur du commentaire ou créateur de la tâche
+        // Vérification : auteur du commentaire ou créateur de la tâche
         if ($user->id !== $commentaire->auteur_id && !$commentaire->tache->users->contains($user) && $user->id !== $commentaire->tache->created_by) {
             return response()->json(['error' => 'Non autorisé'], 403);
         }

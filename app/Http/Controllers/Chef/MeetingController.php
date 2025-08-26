@@ -13,14 +13,14 @@ class MeetingController extends Controller
         // Récupérer le projet
         $projet = Projet::findOrFail($projetId);
 
-        // Générer un identifiant unique pour la réunion (optionnel : inclure l'ID du projet)
+        // Générer un identifiant unique pour la réunion 
         $meetingID = 'projet_' . $projetId . '_' . uniqid();
 
         // Lien de réunion Jitsi
         $joinUrl = "https://meet.jit.si/" . $meetingID;
 
         // Envoyer la notification aux collaborateurs
-        $collaborateurs = $projet->collaborateurs(); // collection de User
+        $collaborateurs = $projet->collaborateurs(); 
 
         foreach ($collaborateurs as $collab) {
             $collab->notify(new ReunionCreee($projet, $joinUrl));

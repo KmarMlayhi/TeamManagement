@@ -67,8 +67,6 @@
                         </tbody>
                     </table>
                 </div>
-
-                {{-- Pagination si nécessaire --}}
                 @if(method_exists($projets, 'links'))
                     <div class="d-flex justify-content-end mt-3">
                         {{ $projets->links() }}

@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="{{ asset('css/auth/passwords.css') }}">
 </head>
 <body>
-    <!-- En-tête gouvernemental identique -->
     <header class="gov-header">
         <div class="container">
             <div class="d-flex align-items-center">

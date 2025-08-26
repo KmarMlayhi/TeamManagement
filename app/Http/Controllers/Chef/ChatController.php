@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Auth;
 class ChatController extends Controller
 {
     // Afficher la liste des projets pour discussion
-    // Dans ChatController.php
-
     public function projetsDiscussion()
     {
         $user = Auth::user();
@@ -23,8 +21,6 @@ class ChatController extends Controller
 
         return view('chef_equipe.project_messages.projet_list', compact('projets'));
     }
-
-
 
     // Afficher les messages d'un projet
     public function showProjetMessages(Projet $projet)
@@ -83,8 +79,8 @@ public function storeMessage(Request $request, Projet $projet)
     // Gestion du fichier
     if ($request->hasFile('fichier')) {
         $file = $request->file('fichier');
-        $data['fichier'] = $file->store('messages_fichiers', 'public'); // chemin pour asset('storage/...') 
-        $data['fichier_original'] = $file->getClientOriginalName();     // nom original du fichier
+        $data['fichier'] = $file->store('messages_fichiers', 'public'); 
+        $data['fichier_original'] = $file->getClientOriginalName();     
     }
 
     ProjectMessage::create($data);
@@ -120,7 +116,6 @@ public function storeMessage(Request $request, Projet $projet)
             return $user;
         });
 
-        // Retourner seulement les champs utiles
         $usersArray = $users->map(function($user) {
             return [
                 'id' => $user->id,
@@ -132,10 +127,8 @@ public function storeMessage(Request $request, Projet $projet)
         return response()->json($usersArray);
 
     } catch (\Exception $e) {
-        // Retourner l'erreur pour debug
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }
-
 
 }

@@ -25,7 +25,7 @@ class LoginController extends Controller
 
             // Bloquer si collaborateur ou chef_equipe non validé
             if (in_array($roleName, ['collaborateur', 'chef_equipe']) && !$user->is_validated) {
-                Auth::logout(); // déconnexion immédiate
+                Auth::logout();
                 return back()->withErrors([
                     'email' => 'Votre compte est en attente de validation.',
                 ]);

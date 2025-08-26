@@ -19,7 +19,7 @@ class Tache extends Model
         'date_fin_reelle' => 'date',
     ];
     
-    // Statuts possibles pour le Kanban
+    // Statuts pour le Kanban
     const STATUTS = [
         'a_faire' => 'À faire',
         'en_cours' => 'En cours',
@@ -37,14 +37,11 @@ class Tache extends Model
     {
         return $this->belongsTo(Projet::class);
     }
-
-     // Relation many-to-many avec User
     
     public function users()
     {
         return $this->belongsToMany(User::class, 'tache_user')->withTimestamps();
     }
-
 
     // Relation avec les documents
     public function taskdocuments()

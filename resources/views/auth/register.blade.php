@@ -13,7 +13,6 @@
 <body>
 
 <div class="auth-container">
-    <!-- Sidebar avec logos -->
    <div class="sidebar">
         <div class="logo-sidebar-container text-center py-3">
             <img src="{{ asset('images/logo_tunis.png') }}"
@@ -105,7 +104,6 @@
             </div>
             
             <div class="row">
-                <!-- Ajoutez ces champs après le champ "Poste" -->
                 <div class="col-md-6 mb-3">
                     <label for="fonction_id" class="form-label">Fonction</label>
                     <div class="input-group">

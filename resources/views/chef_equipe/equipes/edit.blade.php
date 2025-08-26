@@ -56,8 +56,6 @@
                             @endforeach
                         </select>
                     </div>
-
-                  <!-- Sélection des membres -->
                     <!-- Sélection des membres -->
                     <div class="col-12 mb-4">
                         <label for="user_ids" class="form-label required-field">Membres de l'équipe</label>

@@ -58,11 +58,10 @@ class ProjetController extends Controller
         // Création du projet
         $projet = Projet::create($validated);
         
-        // Synchroniser les équipes (many-to-many)
+        // Synchroniser les équipes 
         if (!empty($validated['equipe_ids'])) {
             $projet->equipes()->sync($validated['equipe_ids']);
         }
-
 
         // Traitement des documents
         if ($request->hasFile('documents')) {
@@ -84,7 +83,6 @@ class ProjetController extends Controller
 
     public function show($id)
     {
-        // Modifier 'equipe' en 'equipes'
         $projet = Projet::with(['equipes', 'createdBy', 'documents'])
                       ->where('created_by', auth()->id())
                       ->findOrFail($id);
@@ -94,7 +92,6 @@ class ProjetController extends Controller
 
     public function edit($id)
     {
-        // Modifier 'equipe' en 'equipes'
         $projet = Projet::with(['documents', 'equipes'])
                        ->where('created_by', auth()->id())
                        ->findOrFail($id);
@@ -116,8 +113,8 @@ class ProjetController extends Controller
             'statut' => 'required|in:en_attente,en_cours,termine,suspendu',
             'client' => 'nullable|string|max:255',
             'details_importants' => 'nullable|string',
-            'equipe_ids' => 'nullable|array', // Changer en equipe_ids
-            'equipe_ids.*' => 'exists:equipes,id', // Validation pour chaque ID
+            'equipe_ids' => 'nullable|array', 
+            'equipe_ids.*' => 'exists:equipes,id', 
             'budget' => 'nullable|numeric|min:0',
             'documents' => 'nullable|array',
             'documents.*' => 'file|max:10240',
@@ -126,13 +123,9 @@ class ProjetController extends Controller
         $projet->update($validated);
         
         // Synchroniser les équipes
-        // $projet->equipes()->sync($validated['equipe_ids']);
-        // Synchroniser les équipes (many-to-many)
         if (!empty($validated['equipe_ids'])) {
             $projet->equipes()->sync($validated['equipe_ids']);
         }
-
-
         // Traitement des nouveaux documents
         if ($request->hasFile('new_documents')) {
         foreach ($request->file('new_documents') as $file) {
@@ -188,7 +181,6 @@ class ProjetController extends Controller
 
 public function details(Projet $projet)
 {
-    // Charger les relations
     $projet->load([
         'equipes.utilisateurs:id,name,email,role_id,fonction_id',
         'equipes.utilisateurs.role',

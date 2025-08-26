@@ -323,7 +323,7 @@
         <div class="col-lg-4">
             <div class="detail-card">
                 <div class="card-header">
-                    <i class="fas fa-info-circle me-2"></i>Détails de la tâche
+                    <i class="fas fa-info-circle me-2"></i>Détails de la tâche 
                 </div>
                 <div class="card-body">
                     <ul class="list-group tache-info-list">
@@ -802,6 +802,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     loadUserDocuments();
     loadParentOptions();
+
+        // ---------- STATUT TÂCHE ----------
+    const statusOptions = document.querySelectorAll(".status-option");
+    const hiddenInput = document.getElementById("selectedStatus");
+
+    if (statusOptions.length && hiddenInput) {
+        statusOptions.forEach(option => {
+            option.addEventListener("click", function () {
+
+                statusOptions.forEach(o => o.classList.remove("active"));
+
+                this.classList.add("active");
+
+                hiddenInput.value = this.getAttribute("data-value");
+            });
+        });
+    }
+
 });
 </script> 
 @endsection

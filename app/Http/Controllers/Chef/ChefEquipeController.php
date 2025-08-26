@@ -13,8 +13,7 @@ class ChefEquipeController extends Controller
     public function dashboard()
     {
         $chefId = Auth::id();
-        
-        // Statistiques à récupérer
+
         $stats = [
             'equipes_count' => Equipe::where('created_by', $chefId)->count(),
             'membres_count' => $this->getTotalMembers($chefId),

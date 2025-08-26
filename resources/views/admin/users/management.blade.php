@@ -5,10 +5,12 @@
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/user.css') }}">
 <!-- Breadcrumb -->
-<div class="breadcrumb-container">
+<div class="breadcrumb-container mb-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('admin.home') }}"><i class="fas fa-home"></i></a></li>
+            <li class="breadcrumb-item">
+                <a href="{{ route('admin.home') }}"><i class="fas fa-home"></i></a>
+            </li>
             <li class="breadcrumb-item active" aria-current="page">Utilisateurs</li>
         </ol>
     </nav>
@@ -117,7 +119,7 @@
                                         @endif
                                     </td>
                                     <td> {{ $user->created_at->format('d/m/Y') }}<br>
-    {{ $user->created_at->format('H:i') }}</td>
+                                        {{ $user->created_at->format('H:i') }}</td>
                                     <td>
                                         <div class="action-buttons">
                                             @if(!$user->is_validated && $roleName !== 'admin')
